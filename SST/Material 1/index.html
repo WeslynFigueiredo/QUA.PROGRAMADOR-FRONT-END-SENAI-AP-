@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material 01 - Saúde e segurança no Trabalho </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-bar { transition: width 0.3s ease; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
+
+    <!-- Header / Progress -->
+    <header class="fixed top-0 left-0 w-full bg-white border-b border-slate-200 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">E</div>
+                <h1 class="font-bold text-slate-900 hidden sm:block">Saúde e segurança no Trabalho </h1>
+            </div>
+            <div class="flex-1 max-w-xs mx-8">
+                <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div id="progressBar" class="progress-bar h-full bg-blue-600 w-0"></div>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1 text-right uppercase tracking-widest font-bold">Progresso</p>
+            </div>
+            <div id="pageIndicator" class="text-sm font-bold text-slate-500">Pág. 01/30</div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="mt-20 mb-32 max-w-4xl mx-auto px-6">
+        
+        
+        <div id="contentTarget"></div>
+
+    </main>
+
+    <!-- Navigation Footer -->
+    <footer class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 py-4 px-6 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <button id="prevBtn" onclick="changePage(-1)" class="px-6 py-2 rounded-xl font-semibold text-slate-500 hover:bg-slate-100 disabled:opacity-30 transition">
+                Anterior
+            </button>
+            <div class="flex gap-2" id="dotNav">
+                <!-- Dots added by JS -->
+            </div>
+            <button id="nextBtn" onclick="changePage(1)" class="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition">
+                Próxima Página
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        const pages = [
+            {
+                title: "Introdução: A Realidade do Dev",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">01. Introdução à SST Digital</h2>
+                    <p class="mb-4 leading-relaxed">Diferente da construção civil, a nossa obra é invisível. A segurança do trabalho para o desenvolvedor não envolve capacetes, mas sim a preservação da integridade física e mental frente ao computador.</p>
+                    <div class="grid md:grid-cols-2 gap-6 mt-8">
+                        <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                            <h4 class="font-bold text-blue-800 mb-2">Objetivo</h4>
+                            <p class="text-sm">Garantir uma carreira de 20+ anos sem lesões crônicas ou esgotamento.</p>
+                        </div>
+                        <div class="p-4 bg-red-50 rounded-2xl border border-red-100">
+                            <h4 class="font-bold text-red-800 mb-2">O Perigo</h4>
+                            <p class="text-sm">A postura estática é o "acidente de trabalho" silencioso da nossa era.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Estatísticas do Setor",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">02. Dados do Setor de TI</h2>
+                    <p class="mb-6">Cerca de 65% dos profissionais de tecnologia relatam algum tipo de desconforto osteomuscular ao longo do ano.</p>
+                    <div class="bg-slate-900 text-white p-8 rounded-3xl">
+                        <ul class="space-y-4">
+                            <li class="flex items-center gap-3">
+                                <span class="text-blue-400 font-bold">45%</span> Dor Lombar (Lombalgia)
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="text-blue-400 font-bold">30%</span> Síndrome do Túnel do Carpo
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="text-blue-400 font-bold">25%</span> Fadiga Visual Extrema
+                            </li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "NR-17: O Que Você Precisa Saber",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">03. Teoria: A Norma NR-17</h2>
+                    <p class="mb-4">A Norma Regulamentadora 17 é o pilar jurídico da ergonomia no Brasil. Ela exige que as empresas adaptem o trabalho às características psicofisiológicas do trabalhador.</p>
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-xl">
+                        <h4 class="font-bold text-amber-900">O que a norma cobre?</h4>
+                        <ul class="list-disc ml-5 mt-2 text-amber-800 space-y-1">
+                            <li>Levantamento de peso</li>
+                            <li>Mobiliário (cadeiras, mesas)</li>
+                            <li>Equipamentos</li>
+                            <li>Condições ambientais (ruído, luz, temperatura)</li>
+                            <li>Organização do trabalho</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "Ergonomia Física vs Cognitiva",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">04. Tipos de Ergonomia</h2>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-bold text-blue-600 mb-2">Física</h3>
+                            <p class="text-sm text-slate-600">Trata das posturas, manuseio de materiais e movimentos repetitivos. Foco: Corpo.</p>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-emerald-600 mb-2">Cognitiva</h3>
+                            <p class="text-sm text-slate-600">Trata dos processos mentais, memória, raciocínio e resposta motora. Foco: Cérebro.</p>
+                        </div>
+                    </div>
+                    <p class="mt-6 italic">Como Front-End, você é o maior usuário de ergonomia cognitiva do mundo, devido à carga de lógica e interfaces.</p>
+                `
+            },
+            {
+                title: "A Cadeira: Anatomia de um Trono",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">05. Mobiliário: A Cadeira</h2>
+                    <p class="mb-4">Uma cadeira ergonômica não é um luxo, é uma ferramenta de trabalho básica.</p>
+                    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50">
+                                <tr><th class="p-4">Recurso</th><th class="p-4">Exigência NR-17</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr><td class="p-4">Altura</td><td class="p-4">Ajustável para que pés toquem o chão</td></tr>
+                                <tr><td class="p-4">Braços</td><td class="p-4">Reguláveis para não elevar ombros</td></tr>
+                                <tr><td class="p-4">Encosto</td><td class="p-4">Suporte firme para a região lombar</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                title: "A Mesa: Altura e Profundidade",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">06. Mobiliário: A Mesa</h2>
+                    <p class="mb-4">A mesa deve permitir que você mantenha os ombros relaxados. Se a mesa for muito alta, você levantará os ombros, causando tensão no trapézio.</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-2"><span class="text-green-500 font-bold">✓</span> Profundidade mínima de 60cm para o monitor ficar longe.</li>
+                        <li class="flex items-start gap-2"><span class="text-green-500 font-bold">✓</span> Bordas arredondadas para não prender a circulação do braço.</li>
+                        <li class="flex items-start gap-2"><span class="text-green-500 font-bold">✓</span> Espaço para pernas sem gavetas que bloqueiem o movimento.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "A Monitoria do Monitor",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">07. Visão: Posicionamento do Monitor</h2>
+                    <p class="mb-4 leading-relaxed text-slate-600">A cabeça humana pesa cerca de 5kg. Quando inclinamos 45 graus para ver um notebook, o peso percebido pelo pescoço sobe para 22kg.</p>
+                    <div class="bg-blue-600 text-white p-6 rounded-2xl">
+                        <h4 class="font-bold mb-2 underline">Checklist Visual:</h4>
+                        <p>1. Topo da tela na altura dos olhos.</p>
+                        <p>2. Braço estendido: essa deve ser a distância da tela.</p>
+                        <p>3. Use suporte de monitor ou braço articulado.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Configuração de Mouse e Teclado",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">08. Input: Mouse e Teclado</h2>
+                    <div class="p-6 bg-slate-100 rounded-3xl border-2 border-dashed border-slate-300">
+                        <p class="font-semibold text-center mb-4">Posição Neutra do Pulso</p>
+                        <p class="text-sm text-slate-600">Seus pulsos não devem "dobrar" para cima (extensão) ou para os lados (desvio ulnar). Mantenha o teclado plano, sem os pezinhos traseiros se possível.</p>
+                    </div>
+                `
+            },
+            {
+                title: "A Iluminação Ideal",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">09. Ambiente: Iluminação</h2>
+                    <p class="mb-4">Reflexos na tela causam "ofuscamento", o que força os olhos a trabalharem mais para ler o código.</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 border border-slate-200 rounded-xl">
+                            <p class="text-xs font-bold text-red-500">ERRO</p>
+                            <p class="text-sm">Janela atrás do monitor (contraste excessivo).</p>
+                        </div>
+                        <div class="p-4 border border-slate-200 rounded-xl">
+                            <p class="text-xs font-bold text-green-500">CORRETO</p>
+                            <p class="text-sm">Janela lateral com persiana para controle de luz.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "O que é LER?",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">10. Patologias: O que é LER?</h2>
+                    <p>LER significa **Lesão por Esforço Repetitivo**. É um termo guarda-chuva para dezenas de lesões que ocorrem por movimentos executados milhares de vezes ao dia (como o clique do mouse ou o digitar).</p>
+                    <div class="mt-4 p-4 bg-red-50 text-red-700 rounded-xl">
+                        A LER não surge do dia para a noite. Ela é o resultado de meses de negligência postural.
+                    </div>
+                `
+            },
+            {
+                title: "Síndrome do Túnel do Carpo",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">11. Detalhe: Túnel do Carpo</h2>
+                    <p>O nervo mediano passa por um "túnel" estreito no pulso. Quando os tendões inflamam, apertam esse nervo.</p>
+                    <h4 class="font-bold mt-4">Sintomas:</h4>
+                    <ul class="list-disc ml-5">
+                        <li>Dormência nos dedos polegar, indicador e médio.</li>
+                        <li>Sensação de choque ao digitar.</li>
+                        <li>Perda de força para segurar uma caneca de café.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Tendinites e Tenossinovites",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">12. Detalhe: Tendinites</h2>
+                    <p>Inflamação do tendão (o "cabo de aço" que liga o músculo ao osso). Para o Front-End, a mais comum é a **Tendinite de De Quervain** (na base do polegar), causada pelo uso do celular e cliques repetitivos.</p>
+                `
+            },
+            {
+                title: "A Coluna Cervical",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">13. Cervicalgia</h2>
+                    <p>A dor no pescoço que irradia para os ombros. Muitas vezes é causada pela "protrusão de ombros", quando o Dev se inclina para frente para "entrar" no monitor durante um debug difícil.</p>
+                `
+            },
+            {
+                title: "Carga Cognitiva no Front-End",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">14. Riscos Psicossociais</h2>
+                    <p>Lidar com o ecossistema Javascript (novas libs toda semana), prazos de Sprints e bugs que só aparecem em produção gera uma carga cognitiva altíssima.</p>
+                    <div class="mt-4 p-4 bg-slate-100 rounded-xl italic">
+                        "O estresse mental se traduz em tensão física real."
+                    </div>
+                `
+            },
+            {
+                title: "Síndrome de Burnout",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">15. Burnout em TI</h2>
+                    <p>O esgotamento profissional. Em ambientes ágeis, a pressão constante por entregas pode levar ao Burnout.</p>
+                    <h4 class="font-bold mt-4 text-red-600">Sinais de Alerta:</h4>
+                    <ul class="list-disc ml-5">
+                        <li>Cinismo e irritação com colegas.</li>
+                        <li>Sentimento de que você não é mais bom no que faz.</li>
+                        <li>Insônia pensando no código do dia seguinte.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "A Técnica Pomodoro Ergonômica",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">16. Gestão: Pomodoro Ergonômico</h2>
+                    <p>Use o Pomodoro não só para produtividade, mas para **saúde**.</p>
+                    <div class="flex items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200">
+                        <div class="text-3xl font-black text-red-500">25:05</div>
+                        <div class="text-sm">Trabalhe 25 min. Nos 5 min de pausa, você **DEVE** levantar da cadeira. Ver código durante a pausa não conta.</div>
+                    </div>
+                `
+            },
+            {
+                title: "A Regra 20-20-20",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">17. Saúde Ocular</h2>
+                    <p>O músculo ciliar do olho se cansa de focar de perto. Para relaxá-lo:</p>
+                    <div class="p-6 bg-blue-50 text-blue-800 rounded-2xl text-center">
+                        <p class="text-2xl font-bold">20 Minutos | 20 Pés | 20 Segundos</p>
+                        <p class="text-sm mt-2">A cada 20 min, olhe para algo a 6 metros (20 pés) por 20 segundos.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Mito vs Verdade: Descanso de Pulso",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">18. Mito vs Verdade</h2>
+                    <p class="font-bold">"Devo usar almofadas de pulso?"</p>
+                    <p class="text-slate-600">**Cuidado.** O apoio de pulso deve apoiar a **base da palma da mão**, nunca o túnel do carpo (o centro do pulso). Apoiar o centro do pulso aumenta a pressão interna nos nervos.</p>
+                `
+            },
+            {
+    title: "Workshop: Auditoria do Setup",
+    content: `
+        <h2 class="text-3xl font-bold mb-6 text-slate-900">19. Workshop: Auditoria</h2>
+        <p class="text-slate-600 mb-4">Pegue seu celular e tire uma foto sua de perfil enquanto trabalha. Olhe para a foto e responda com honestidade:</p>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+            <ul class="space-y-3 mt-4 text-slate-700">
+                <li class="flex items-start">
+                    <input type="checkbox" class="mt-1 mr-3">
+                    <span><b>Alinhamento Cervical:</b> Sua orelha está na linha do seu ombro?</span>
+                </li>
+                <li class="flex items-start">
+                    <input type="checkbox" class="mt-1 mr-3">
+                    <span><b>Ângulo de Braço:</b> Seu cotovelo está em 90 graus próximo ao corpo?</span>
+                </li>
+                <li class="flex items-start">
+                    <input type="checkbox" class="mt-1 mr-3">
+                    <span><b>Postura Dorsal:</b> Suas costas estão curvadas como um camarão (Shrimp Mode)?</span>
+                </li>
+                <li class="flex items-start">
+                    <input type="checkbox" class="mt-1 mr-3">
+                    <span><b>Base Inferior:</b> Seus pés estão 100% apoiados no chão ou suporte?</span>
+                </li>
+                <li class="flex items-start">
+                    <input type="checkbox" class="mt-1 mr-3">
+                    <span><b>Visão:</b> O topo do monitor está na altura exata dos seus olhos?</span>
+                </li>
+            </ul>
+
+            <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 mt-4">
+                <h4 class="font-bold text-blue-800 mb-2">💡 Dica de Instrutor</h4>
+                <p class="text-sm text-blue-700 leading-relaxed">
+                    Se você marcou menos de 4 itens, sua <b>dívida técnica biológica</b> está alta. 
+                    O cansaço que você sente no fim do dia não é "normal", é falta de ajuste no seu hardware.
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-8 p-4 bg-slate-100 rounded-xl text-center">
+            <p class="text-xs text-slate-500 uppercase font-bold tracking-widest">Ação Corretiva</p>
+            <p class="text-slate-700">Ajuste seu monitor primeiro. O corpo tende a seguir a altura dos olhos!</p>
+        </div>
+    `
+            },
+            {
+                title: "Workshop: O Peso do Laptop",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">20. O Notebook é o Vilão</h2>
+                    <p>O notebook foi feito para uso casual, não para 8h diárias. Se você usa o notebook direto na mesa sem suporte, você está destruindo sua cervical.</p>
+                    <p class="mt-4 font-bold text-blue-600 underline">Solução: Suporte + Teclado/Mouse externos.</p>
+                `
+            },
+            {
+                title: "01. Prática: Alongamento de Pulsos",
+                content: `
+                    <div class="flex gap-6 items-center bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                        <img src="21.png" alt="Alongamento de pulsos" class="w-32 h-32 rounded-xl object-cover shadow-md">
+    
+                    <div class="flex-1">
+                        <p class="text-slate-600 leading-relaxed">
+                        <span class="block font-bold text-blue-600 mb-1">Passo a passo:</span>
+                        Estique o braço com a palma para frente (pare!). Puxe os dedos para trás suavemente. 
+                        Segure <span class="font-bold">20s</span>. Repita com a palma para baixo.
+                        </p>
+                    </div>
+                    </div>
+                `
+            },
+            {
+                title: "Alongamento 02: Pescoço",
+                content: `
+                    <div class="flex gap-6 items-center bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                    <img src="22.png" alt="Alongamento de pescoço" class="w-32 h-32 rounded-xl object-cover shadow-md">
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">22. Prática: Soltura Cervical</h2>
+                    <p>Incline a cabeça para o lado (orelha em direção ao ombro). Use o peso da mão para auxiliar, sem puxar com força. Sinta o alongamento lateral. 30s de cada lado.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Alongamento 03: Trapézio",
+                content: `
+                    <div class="flex gap-6 items-center bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                    <img src="23.png" alt="Alongamento de ombros" class="w-32 h-32 rounded-xl object-cover shadow-md">
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">23. Prática: Rotação de Ombros</h2>
+                    <p>Gire os ombros para trás 10 vezes em movimentos circulares lentos e amplos. Isso "abre" o peitoral e neutraliza a postura de camarão.</p>
+                `
+            },
+            {
+                title: "Alongamento 04: Visão",
+                content: `
+                    <div class="flex gap-6 items-center bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                    <img src="24.png" alt="Alongamento de ombros" class="w-32 h-32 rounded-xl object-cover shadow-md">
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">24. Prática: Palming</h2>
+                    <p>Esfregue as palmas das mãos até aquecerem. Feche os olhos e cubra-os com as palmas em concha (sem apertar). Sinta o calor e a escuridão total por 1 minuto. Isso descansa a retina.</p>
+                `
+            },
+            {
+                title: "Alongamento 05: Extensores",
+                content: `
+                    <div class="flex gap-6 items-center bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                    <img src="25.png" alt="Alongamento de ombros" class="w-32 h-32 rounded-xl object-cover shadow-md">
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">25. Prática: Dedos e Mãos</h2>
+                    <p>Abra bem as mãos como se estivesse tentando tocar as paredes com os dedos. Depois, feche os punhos com o polegar por dentro. Repita 10 vezes para lubrificar as articulações dos dedos.</p>
+                `
+            },
+            {
+                title: "Case Study: O Dev de Ferro",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">26. Caso Real: O Dev de Ferro</h2>
+                    <p>Ricardo, 26 anos, Front-End Senior. Trabalha no sofá, notebook no colo, das 9h às 22h. Bebe pouco líquido e ignora dores no punho há 6 meses.</p>
+                    <p class="mt-4 font-bold text-red-600">Diagnóstico:</p>
+                    <p class="text-sm">Hernia de disco cervical iminente e Tenossinovite crônica. Ricardo teve que se afastar por 3 meses.</p>
+                `
+            },
+            {
+                title: "As 5 Melhorias de Ricardo",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">27. Análise do Caso</h2>
+                    <p>O que Ricardo deveria ter feito?</p>
+                    <ol class="list-decimal ml-5 space-y-2 mt-4">
+                        <li>Sair do sofá e ir para uma mesa estável.</li>
+                        <li>Usar um suporte de notebook para elevar a tela.</li>
+                        <li>Instalar um software de lembrete de pausas (ex: Stretchly).</li>
+                        <li>Hidratação constante (água reduz inflamação).</li>
+                        <li>Tratamento fisioterápico ao primeiro sinal de dor.</li>
+                    </ol>
+                `
+            },
+            {
+                title: "Quiz Final: Parte 1",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">28. Quiz de Fixação</h2>
+                    <p class="mb-4">A cada quanto tempo devemos fazer uma pausa ativa?</p>
+                    <div class="space-y-3">
+                        <button class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-blue-50 transition" onclick="alert('Incorreto: 4 horas é muito tempo!')">A) A cada 4 horas.</button>
+                        <button class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-blue-50 transition" onclick="alert('Correto! O ideal é entre 50 a 60 min.')">B) A cada 50 a 60 minutos.</button>
+                        <button class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-blue-50 transition" onclick="alert('Pausar é bom, mas 10 min é pouco para TI.')">C) Só quando o código compilar.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Quiz Final: Parte 2",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">29. Quiz de Fixação</h2>
+                    <p class="mb-4">Onde deve estar o topo da tela do seu monitor?</p>
+                    <div class="space-y-3">
+                        <button class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-blue-50 transition" onclick="alert('Correto! Isso mantém o pescoço neutro.')">A) Na altura dos olhos.</button>
+                        <button class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-blue-50 transition" onclick="alert('Incorreto: isso causa tensão cervical.')">B) Abaixo da linha do peito.</button>
+                        <button class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-blue-50 transition" onclick="alert('Incorreto: você forçará o pescoço para cima.')">C) Acima da cabeça.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Conclusão",
+                content: `
+                    <div class="text-center py-10">
+                        <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">✓</div>
+                        <h2 class="text-3xl font-bold mb-4 text-slate-900">Material Concluído!</h2>
+                    </div>
+                `
+            }
+        ];
+
+        let currentPage = 0;
+
+        function renderPage() {
+            const container = document.getElementById('contentTarget');
+            const page = pages[currentPage];
+            
+            container.innerHTML = `
+                <div class="page-content active">
+                    <p class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">${page.title}</p>
+                    ${page.content}
+                </div>
+            `;
+
+            // Update Progress UI
+            const progress = ((currentPage + 1) / pages.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('pageIndicator').innerText = `Pág. ${String(currentPage + 1).padStart(2, '0')}/${pages.length}`;
+            
+            // Handle buttons
+            document.getElementById('prevBtn').disabled = currentPage === 0;
+            document.getElementById('nextBtn').innerText = currentPage === pages.length - 1 ? "Finalizar" : "Próxima Página";
+            
+            window.scrollTo(0,0);
+            updateDots();
+        }
+
+        function changePage(step) {
+            const next = currentPage + step;
+            if (next >= 0 && next < pages.length) {
+                currentPage = next;
+                renderPage();
+            } else if (next === pages.length) {
+                alert("Parabéns! Continue cuidando da sua saúde.");
+            }
+        }
+
+        function updateDots() {
+            const dotNav = document.getElementById('dotNav');
+            dotNav.innerHTML = '';
+            // Only show 5 dots around current for mobile
+            const start = Math.max(0, currentPage - 2);
+            const end = Math.min(pages.length, start + 5);
+
+            for (let i = 0; i < pages.length; i++) {
+                if (i >= start && i < end) {
+                    const dot = document.createElement('div');
+                    dot.className = `w-1.5 h-1.5 rounded-full transition-all ${i === currentPage ? 'bg-blue-600 w-4' : 'bg-slate-300'}`;
+                    dotNav.appendChild(dot);
+                }
+            }
+        }
+
+        // Initialize
+        renderPage();
+    </script>
+</body>
+</html>
