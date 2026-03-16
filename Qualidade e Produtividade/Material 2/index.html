@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qualidade & Produtividade | Material 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        .progress-bar { transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="bg-emerald-50 text-slate-900 antialiased">
+
+    <!-- Header Fixo -->
+    <header class="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-md border-b border-emerald-100 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-slate-900 leading-none">Lean & Resolução de Problemas</h1>
+                    <p class="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mt-1">Front-End | SENAI-AP</p>
+                </div>
+            </div>
+            <div class="hidden md:block flex-1 max-w-xs mx-8">
+                <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div id="progressBar" class="progress-bar h-full bg-emerald-600 w-0"></div>
+                </div>
+            </div>
+            <div id="pageIndicator" class="text-sm font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">01/30</div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="mt-24 mb-32 max-w-4xl mx-auto px-6">
+        <div id="contentTarget"></div>
+    </main>
+
+    <!-- Navegação Inferior -->
+    <footer class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <button id="prevBtn" onclick="changePage(-1)" class="flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition disabled:opacity-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Voltar
+            </button>
+            <div id="dotNav" class="hidden sm:flex gap-1.5"></div>
+            <button id="nextBtn" onclick="changePage(1)" class="group flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 shadow-xl shadow-emerald-200 transition-all active:scale-95">
+                Próxima 
+                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        const pages = [
+            {
+                title: "Bem-vindo, Dev!",
+                content: `
+                    <div class="text-center py-12">
+                        <h2 class="text-5xl font-extrabold text-slate-900 mb-6">Material 2:<br><span class="text-emerald-600">O Dev Inteligente</span></h2>
+                        <p class="text-lg text-slate-600 max-w-xl mx-auto mb-10">Agora que organizamos a casa com o 5S, vamos aprender a trabalhar de forma enxuta. Menos esforço inútil, mais resultado real.</p>
+                        <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-emerald-100 border border-emerald-50">
+                            <h4 class="font-bold text-emerald-600 uppercase tracking-widest text-xs mb-4">Missões do Dia</h4>
+                            <ul class="text-left space-y-4">
+                                <li class="flex gap-3 items-start"><span class="bg-emerald-100 p-1 rounded">🧩</span> <b>Filosofia Lean:</b> Caça aos desperdícios digitais.</li>
+                                <li class="flex gap-3 items-start"><span class="bg-emerald-100 p-1 rounded">📉</span> <b>Pareto & Ishikawa:</b> As armas para destruir bugs.</li>
+                                <li class="flex gap-3 items-start"><span class="bg-emerald-100 p-1 rounded">🤝</span> <b>Colaboração:</b> Por que ninguém coda sozinho.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "O que é Lean?",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">01. O que é esse tal de Lean?</h2>
+                    <p class="mb-4 leading-relaxed"><b>Lean</b> (Enxuto) é uma filosofia que diz: "Se algo não agrega valor ao cliente, é desperdício".</p>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                        <h4 class="font-bold text-slate-900 mb-4 text-center">Analogia: A Cozinha de Hamburguer 🍔</h4>
+                        <p class="text-sm text-slate-600">Imagine que você quer um X-Salada:</p>
+                        <ul class="space-y-3 mt-4">
+                            <li class="p-3 bg-emerald-50 rounded-xl"><b>Valor:</b> O hamburguer pronto e gostoso no seu prato.</li>
+                            <li class="p-3 bg-red-50 rounded-xl"><b>Desperdício:</b> O cozinheiro ter que andar 50 metros para pegar o queijo que está longe da chapa.</li>
+                        </ul>
+                        <p class="mt-4 text-sm italic">No Front-End, o desperdício é tudo o que te faz demorar mais para entregar o site sem melhorar o resultado final.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Caça ao Tesouro (Desperdícios)",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">02. Caça aos Desperdícios Lean</h2>
+                    <p class="mb-6">No desenvolvimento de software, existem 8 desperdícios clássicos. Vamos focar nos que mais atrapalham o iniciante:</p>
+                    <div class="grid gap-4">
+                        <div class="p-4 bg-white rounded-2xl border border-slate-200 flex items-center gap-4">
+                            <div class="text-2xl">⏳</div>
+                            <div>
+                                <h4 class="font-bold">Espera</h4>
+                                <p class="text-xs text-slate-500">Ficar parado esperando o computador ligar ou a internet carregar a lib.</p>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-white rounded-2xl border border-slate-200 flex items-center gap-4">
+                            <div class="text-2xl">⚙️</div>
+                            <div>
+                                <h4 class="font-bold">Processamento Extra</h4>
+                                <p class="text-xs text-slate-500">Ficar 2 horas mudando a cor do botão de 'Azul Céu' para 'Azul Marinho' enquanto o site nem tem formulário ainda.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Ação: Detetive de Tempo",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">03. ⚡ AÇÃO: Detetive de Tempo</h2>
+                    <p class="mb-4 text-slate-600">Marque quais dessas situações você já viveu esta semana:</p>
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-emerald-50 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded text-emerald-600">
+                            <span class="text-sm italic">"Fiquei ouvindo música e escolhendo playlist em vez de codar."</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-emerald-50 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded text-emerald-600">
+                            <span class="text-sm italic">"Fiz um código gigante que o professor não pediu e deu erro."</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-emerald-50 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded text-emerald-600">
+                            <span class="text-sm italic">"Abri o YouTube para ver um tutorial e acabei vendo vídeo de gato."</span>
+                        </label>
+                    </div>
+                    <p class="mt-6 text-sm font-bold text-emerald-700">Se você marcou alguma, você encontrou um Desperdício Lean! O primeiro passo para a qualidade é admitir que estamos jogando tempo fora.</p>
+                `
+            },
+            {
+                title: "Lean: Superprodução no Código",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">04. Superprodução: O Código que Ninguém Pediu</h2>
+                    <p class="mb-6 leading-relaxed">Fazer mais do que o necessário é o pior desperdício. No Front-End, isso se chama "YAGNI" (*You Ain't Gonna Need It* - Você não vai precisar disso).</p>
+                    <div class="bg-slate-900 rounded-2xl p-6 overflow-hidden">
+                        <p class="text-xs text-emerald-400 mb-2">// Pseudocódigo: Superprodução</p>
+                        <code class="text-slate-300 text-sm block code-font">
+                            Algoritmo "CalcularSoma" <br>
+                            Var n1, n2: Inteiro <br>
+                            Inicio <br>
+                            &nbsp;&nbsp;// O pedido era só somar <br>
+                            &nbsp;&nbsp;exibir(n1 + n2) <br>
+                            &nbsp;&nbsp;// DESPERDÍCIO: Fiz subtrair, multiplicar e dividir também por "segurança" <br>
+                            &nbsp;&nbsp;exibir(n1 - n2) <br>
+                            &nbsp;&nbsp;exibir(n1 * n2) <br>
+                            FimAlgoritmo
+                        </code>
+                    </div>
+                    <p class="mt-4 text-xs text-slate-500">Resultado: Mais código para dar bug e mais tempo gasto sem necessidade.</p>
+                `
+            },
+            {
+                title: "Ferramentas de Análise: Fluxograma",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">05. Resolvendo Mistérios: O Fluxograma</h2>
+                    <p class="mb-6">Para melhorar a produtividade, precisamos saber **como** trabalhamos. O fluxograma é o mapa do tesouro.</p>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-center">
+                        <div class="inline-flex flex-col items-center gap-3">
+                            <div class="px-4 py-2 border-2 border-slate-900 rounded-full text-xs font-bold">LIGAR PC</div>
+                            <div class="w-0.5 h-4 bg-slate-900"></div>
+                            <div class="px-4 py-2 border-2 border-slate-900 bg-emerald-100 text-xs font-bold italic">ABRIR VS CODE?</div>
+                            <div class="w-0.5 h-4 bg-slate-900"></div>
+                            <div class="px-4 py-2 border-2 border-slate-900 rounded-md text-xs font-bold">CODAR</div>
+                        </div>
+                    </div>
+                    <div class="mt-8 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
+                        <p class="font-bold text-amber-800 text-sm">⚡ MISSÃO FORA DA TELA:</p>
+                        <p class="text-xs text-amber-900 mt-1">Pegue um papel e desenhe seu fluxo de trabalho: desde o momento que você senta na cadeira até a primeira linha de código. Onde você trava?</p>
+                    </div>
+                `
+            },
+            {
+                title: "A Regra de Pareto (80/20)",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">06. O Segredo de Pareto (80/20)</h2>
+                    <p class="mb-6 leading-relaxed">Vilfredo Pareto descobriu que **80% dos resultados vêm de 20% das causas**. Na programação para iniciantes:</p>
+                    <div class="p-6 bg-white rounded-[2rem] border border-slate-200 relative overflow-hidden">
+                        <div class="flex items-end gap-2 h-32">
+                            <div class="w-1/4 bg-red-500 h-[80%] rounded-t-lg"></div>
+                            <div class="w-3/4 bg-slate-200 h-[20%] rounded-t-lg"></div>
+                        </div>
+                        <p class="mt-4 text-xs text-slate-500">80% dos seus bugs são causados por 20% dos seus erros bobos.</p>
+                    </div>
+                    <div class="mt-6 grid grid-cols-2 gap-4">
+                        <div class="p-3 bg-red-50 rounded-xl text-center font-bold text-red-700 text-xs">Esquecer o ;</div>
+                        <div class="p-3 bg-red-50 rounded-xl text-center font-bold text-red-700 text-xs">Fechar ) errado</div>
+                    </div>
+                `
+            },
+            {
+                title: "Pareto na Prática",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">07. ⚡ AÇÃO: Foco no que importa</h2>
+                    <p class="mb-4">Se você resolver os erros de digitação e nomes de variáveis (os 20%), você elimina 80% das dores de cabeça.</p>
+                    <div class="bg-emerald-900 text-white p-8 rounded-3xl">
+                        <h4 class="font-bold mb-4">Dica de Mentor:</h4>
+                        <p class="text-sm font-light">Não perca tempo tentando aprender "frameworks mágicos" se você ainda não domina a base. A base (20%) é o que sustenta 80% da sua carreira.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Ishikawa (Espinha de Peixe)",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">08. Diagrama de Ishikawa</h2>
+                    <p class="mb-4">Também chamado de **Espinha de Peixe**. Ele ajuda a achar a causa raiz de um problema (ex: o site não carrega).</p>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 overflow-x-auto">
+                        <div class="min-w-[400px] flex items-center justify-center">
+                            <svg viewBox="0 0 200 100" class="w-full max-w-xs">
+                                <line x1="10" y1="50" x2="180" y2="50" stroke="black" stroke-width="2" />
+                                <text x="182" y="55" font-size="10" font-weight="bold">BUG</text>
+                                <line x1="40" y1="50" x2="60" y2="20" stroke="black" />
+                                <text x="35" y="15" font-size="8">Mão de Obra</text>
+                                <line x1="100" y1="50" x2="120" y2="20" stroke="black" />
+                                <text x="100" y="15" font-size="8">Máquina</text>
+                                <line x1="40" y1="50" x2="60" y2="80" stroke="black" />
+                                <text x="35" y="90" font-size="8">Método</text>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-xs italic text-center">Para cada "espinha", você pergunta: "O problema está no meu conhecimento? No meu PC? Ou no jeito que eu escrevi?"</p>
+                `
+            },
+            {
+                title: "Trabalho em Equipe: A Teoria",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">09. Jogo da Colaboração</h2>
+                    <p class="mb-6">Na indústria de TI, o "Gênio Solitário" é um mito. Qualidade é um esporte de equipe.</p>
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                            <h4 class="font-bold text-indigo-600 mb-2">Empatia Técnica</h4>
+                            <p class="text-sm">É escrever o código pensando que quem vai ler é uma pessoa que sabe onde você mora.</p>
+                        </div>
+                        <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                            <h4 class="font-bold text-emerald-600 mb-2">Code Review</h4>
+                            <p class="text-sm">Um colega revisa seu código para achar o que seus olhos cansados não viram.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Desafio: O Código do Colega",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6 text-slate-900">10. ⚡ MISSÃO PRÁTICA: Troca de Lugar</h2>
+                    <div class="p-8 bg-indigo-50 border-4 border-dashed border-indigo-200 rounded-[2rem]">
+                        <p class="font-bold text-indigo-800 text-lg mb-4 text-center">Desafio de Empatia:</p>
+                        <p class="text-sm text-indigo-900 mb-6">Se estiver em aula, troque de lugar com o colega ao lado. Tente descobrir o que o código dele faz em 1 minuto sem perguntar nada para ele.</p>
+                        <p class="text-xs font-bold text-indigo-500 uppercase">Se ele não entendeu:</p>
+                        <p class="text-sm text-indigo-700 italic">Sua qualidade de documentação e nomes de variáveis precisam melhorar hoje!</p>
+                    </div>
+                `
+            },
+            {
+                title: "Kaizen: Melhoria Contínua",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">11. Kaizen: 1% Melhor todo dia</h2>
+                    <p class="mb-4">O Kaizen não pede revoluções, ele pede pequenas mudanças que acumulam.</p>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                        <p class="text-sm font-bold text-slate-700 mb-4">Exemplo de Kaizen para Dev:</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3">
+                                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                                <span class="text-sm text-slate-600">Hoje aprendi 1 atalho de teclado novo.</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                                <span class="text-sm text-slate-600">Amanhã vou padronizar o nome das minhas pastas.</span>
+                            </li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "Lean: Os 5 Porquês",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">12. Ferramenta: Os 5 Porquês</h2>
+                    <p class="mb-6">Para achar a causa raiz de um bug, pergunte "Por que?" 5 vezes.</p>
+                    <div class="space-y-2">
+                        <p class="text-sm">1. O site travou? <b>Por que?</b> -> O código parou.</p>
+                        <p class="text-sm">2. Por que? -> Houve erro de variável.</p>
+                        <p class="text-sm">3. Por que? -> Tentei acessar algo que não existia.</p>
+                        <p class="text-sm">4. Por que? -> O usuário não digitou nada.</p>
+                        <p class="text-sm">5. Por que? -> **Eu esqueci de validar o formulário!** (Causa Raiz)</p>
+                    </div>
+                `
+            },
+            {
+                title: "O Poka-Yoke do Código",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">13. Poka-Yoke: À Prova de Erros</h2>
+                    <p class="mb-4">Na indústria, Poka-Yoke é um dispositivo que impede o erro (ex: a tomada de 3 pinos só entra de um jeito).</p>
+                    <div class="bg-slate-900 p-6 rounded-2xl">
+                        <p class="text-xs text-emerald-400 mb-4">// Pseudocódigo: Poka-Yoke</p>
+                        <code class="text-slate-300 text-sm block code-font">
+                            Funcao Dividir(a, b: Inteiro) <br>
+                            Inicio <br>
+                            &nbsp;&nbsp;Se b = 0 Entao <br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;exibir("ERRO: Ninguém divide por zero!") <br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;Retornar 0 <br>
+                            &nbsp;&nbsp;FimSe <br>
+                            &nbsp;&nbsp;Retornar a / b <br>
+                            FimFuncao
+                        </code>
+                    </div>
+                    <p class="mt-4 text-xs italic">Isso impede que o sistema quebre. Qualidade é prever a asneira antes dela acontecer.</p>
+                `
+            },
+            {
+                title: "Lead Time vs Cycle Time",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">14. Métricas: Tempo é Qualidade</h2>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div class="p-6 bg-white rounded-2xl border-t-8 border-indigo-400">
+                            <h4 class="font-bold">Lead Time</h4>
+                            <p class="text-xs">Tempo desde o pedido do cliente até a entrega final do site.</p>
+                        </div>
+                        <div class="p-6 bg-white rounded-2xl border-t-8 border-emerald-400">
+                            <h4 class="font-bold">Cycle Time</h4>
+                            <p class="text-xs">Tempo que você gasta efetivamente escrevendo o código de uma funcionalidade.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Just-in-Time para Devs",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">15. Just-in-Time (JIT)</h2>
+                    <p class="mb-4">Trabalhar "bem na hora". Significa não estocar conhecimento ou código que você não vai usar agora.</p>
+                    <div class="p-6 bg-amber-50 border-l-4 border-amber-500 rounded-r-xl">
+                        <p class="text-sm font-bold text-amber-900 uppercase">Não seja um Acumulador Digital!</p>
+                        <p class="text-xs text-amber-800 mt-2">Não abra 50 abas de tutoriais para um projeto que você só vai começar mês que vem. Foca na aba que você está usando **agora**.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Andon: O Grito de Ajuda",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">16. Andon: A Lanterna de Alerta</h2>
+                    <p class="mb-4 leading-relaxed">Nas fábricas Toyota, qualquer um podia puxar uma corda para parar a produção se visse um erro. Isso se chama **Andon**.</p>
+                    <div class="p-6 bg-red-600 text-white rounded-3xl shadow-xl">
+                        <h4 class="font-bold text-center mb-2">Puxe a Corda! 🚨</h4>
+                        <p class="text-sm text-center">Se você está travado num bug há mais de 30 minutos e não sabe mais o que fazer, peça ajuda. Ficar travado sozinho é desperdício de produtividade.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Genshi Genbutsu (Vá ver!)",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">17. Genshi Genbutsu: Vá à fonte</h2>
+                    <p class="mb-4 leading-relaxed">Significa sair da teoria e ir ver o problema de perto. O site está dando erro no celular do cliente? Pegue o celular e veja com seus próprios olhos.</p>
+                    <p class="text-sm text-slate-500 italic">"Dados são importantes, mas os fatos estão onde as coisas acontecem."</p>
+                `
+            },
+            {
+                title: "Documentação Enxuta",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">18. Documentação: Menos é Mais</h2>
+                    <p class="mb-4">Não escreva manuais de 100 páginas que ninguém lê. Escreva comentários precisos e arquivos README.md curtos.</p>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 text-xs">
+                        <h5 class="font-bold mb-2">README.md Ideal:</h5>
+                        <p>1. O que este site faz.</p>
+                        <p>2. Como instalar.</p>
+                        <p>3. Quem participou.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Qualidade de Dados",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6 text-slate-900">19. Lixo entra, Lixo sai (GIGO)</h2>
+                    <p class="mb-4">Se o seu algoritmo recebe dados ruins, o resultado será ruim.</p>
+                    <div class="bg-slate-900 p-6 rounded-2xl">
+                        <p class="text-xs text-emerald-400 mb-4">// Pseudocódigo: Validação</p>
+                        <code class="text-slate-300 text-sm block code-font">
+                            Se idadeUsuario < 0 Entao <br>
+                            &nbsp;&nbsp;exibir("Qualidade: Erro de dado!") <br>
+                            FimSe
+                        </code>
+                    </div>
+                `
+            },
+            {
+                title: "Desperdício: Talento Humano",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">20. O 8º Desperdício</h2>
+                    <p class="mb-4 leading-relaxed">Ignorar a criatividade e o talento das pessoas. Se você tem uma ideia de como melhorar o código do time, fale! Silêncio é desperdício de inteligência.</p>
+                `
+            },
+            {
+                title: "Métricas de Performance",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">21. Produtividade Técnica</h2>
+                    <p class="mb-6">Como medir se seu site é produtivo?</p>
+                    <ul class="space-y-4">
+                        <li class="flex gap-3"><span class="font-bold text-emerald-600">Lighthouse Score:</span> O Google diz se seu código é rápido.</li>
+                        <li class="flex gap-3"><span class="font-bold text-emerald-600">First Paint:</span> Quanto tempo o usuário leva para ver a primeira cor na tela.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "O custo de consertar",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">22. Custo da Qualidade</h2>
+                    <p class="mb-4">Consertar um bug em produção custa **100x mais** do que consertar enquanto você está desenhando o fluxograma.</p>
+                    <div class="p-4 bg-red-50 border-2 border-red-200 rounded-xl text-center font-bold text-red-800">
+                        Pense antes de codar. É mais barato.
+                    </div>
+                `
+            },
+            {
+                title: "Mito vs Verdade: Lean",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6 text-slate-900">23. Mito vs Verdade</h2>
+                    <div class="p-6 bg-white rounded-3xl border border-slate-200">
+                        <p class="font-bold mb-2">"Lean é para demitir pessoas?"</p>
+                        <p class="text-sm text-slate-600"><b>Mito.</b> Lean é para eliminar o trabalho chato e repetitivo, deixando as pessoas focarem no que são boas: resolver problemas criativos.</p>
+                    </div>
+                `
+            },
+            {
+                title: "A Pirâmide da Decisão",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">24. Decisão Baseada em Fatos</h2>
+                    <p class="mb-4">Não diga "Eu acho que o site está lento". Use ferramentas para provar que está lento. Qualidade exige dados, não opiniões.</p>
+                `
+            },
+            {
+                title: "Workshop: Mapa de Processo",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">25. Workshop: Seu Fluxo</h2>
+                    <p class="mb-4 text-sm">Desenhe seu processo de criar um botão CSS:</p>
+                    <div class="grid grid-cols-3 gap-2 text-[10px] text-center">
+                        <div class="p-2 border border-slate-300 rounded">HTML</div>
+                        <div class="p-2 border border-slate-300 rounded">CSS</div>
+                        <div class="p-2 border border-slate-300 rounded">TESTE</div>
+                    </div>
+                    <p class="mt-4 text-xs italic">Onde você perde mais tempo? É escolhendo a cor ou ajustando o tamanho?</p>
+                `
+            },
+            {
+                title: "Padronização de Componentes",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">26. Componentização: O 5S do Código</h2>
+                    <p class="mb-4 leading-relaxed">Em vez de criar 50 botões diferentes, crie um padrão e reutilize. Isso é produtividade Lean pura!</p>
+                `
+            },
+            {
+                title: "Checklist de Pareto",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">27. Os 20% que importam</h2>
+                    <ul class="space-y-2">
+                        <li>[ ] O site funciona?</li>
+                        <li>[ ] O site é responsivo (celular)?</li>
+                        <li>[ ] O link principal funciona?</li>
+                    </ul>
+                    <p class="mt-4 text-xs">Se isso falhar, não adianta ter uma animação linda.</p>
+                `
+            },
+            {
+                title: "Quiz Final: Lean",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">28. Quiz: Mente Enxuta</h2>
+                    <p class="mb-4">O que é desperdício no desenvolvimento Front-End?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-red-50 transition">A) Beber água entre as aulas.</button>
+                        <button onclick="alert('Correto! O tempo gasto em algo inútil nunca volta.')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-emerald-50 transition">B) Ficar 3 horas escolhendo um ícone antes de fazer o site funcionar.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Quiz Final: Ishikawa",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">29. Quiz: Ferramentas</h2>
+                    <p class="mb-4">Para que serve o Diagrama de Ishikawa (Espinha de Peixe)?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Correto! Ele analisa todas as possíveis causas de um erro.')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-emerald-50 transition">A) Para encontrar a causa raiz de um problema.</button>
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-red-50 transition">B) Para desenhar logos de peixes.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Conclusão do Material",
+                content: `
+                    <div class="text-center py-10">
+                        <div class="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h2 class="text-4xl font-extrabold text-slate-900 mb-4">Você é um Dev de Qualidade!</h2>
+                        <p class="text-slate-500 mb-8 max-w-sm mx-auto text-lg">Agora você sabe que qualidade é feita de organização (5S) e inteligência analítica (Lean/Pareto).</p>
+                        <div class="p-6 bg-white rounded-3xl border-2 border-emerald-100 inline-block">
+                            <p class="text-xs font-bold text-emerald-400 uppercase mb-1">Missão para amanhã:</p>
+                            <p class="font-bold text-slate-800">"Tente ser 1% melhor que hoje."</p>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        let currentPage = 0;
+
+        function renderPage() {
+            const container = document.getElementById('contentTarget');
+            const page = pages[currentPage];
+            
+            container.innerHTML = `
+                <div class="page-content active">
+                    <p class="text-xs font-black text-emerald-400 uppercase tracking-[0.2em] mb-3">${page.title}</p>
+                    ${page.content}
+                </div>
+            `;
+
+            const progress = ((currentPage + 1) / pages.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('pageIndicator').innerText = `${String(currentPage + 1).padStart(2, '0')}/${pages.length}`;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 0;
+            document.getElementById('nextBtn').innerText = currentPage === pages.length - 1 ? "Finalizar o material" : "Próxima Página";
+            
+            window.scrollTo(0, 0);
+            updateDots();
+        }
+
+        function changePage(step) {
+            const next = currentPage + step;
+            if (next >= 0 && next < pages.length) {
+                currentPage = next;
+                renderPage();
+            } else if (next === pages.length) {
+                alert("Material concluído! Você acaba de subir de nível na sua carreira Front-End.");
+            }
+        }
+
+        function updateDots() {
+            const dotNav = document.getElementById('dotNav');
+            dotNav.innerHTML = '';
+            const start = Math.max(0, currentPage - 3);
+            const end = Math.min(pages.length, start + 7);
+
+            for (let i = 0; i < pages.length; i++) {
+                if (i >= start && i < end) {
+                    const dot = document.createElement('div');
+                    dot.className = `w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentPage ? 'bg-emerald-600 w-6' : 'bg-slate-300'}`;
+                    dotNav.appendChild(dot);
+                }
+            }
+        }
+
+        renderPage();
+    </script>
+</body>
+</html>
