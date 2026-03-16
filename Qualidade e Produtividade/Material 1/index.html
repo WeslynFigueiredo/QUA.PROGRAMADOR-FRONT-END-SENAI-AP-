@@ -268,14 +268,28 @@
                 content: `
                     <h2 class="text-3xl font-extrabold mb-6">12. O Checklist 5W2H</h2>
                     <p class="mb-6">É um conjunto de perguntas para você não esquecer nada antes de começar um projeto técnico.</p>
-                    <div class="bg-slate-900 p-6 rounded-3xl text-slate-300 text-xs">
-                        <p class="mb-2"><b>What?</b> (O que será feito?)</p>
-                        <p class="mb-2"><b>Why?</b> (Por que fazer?)</p>
-                        <p class="mb-2"><b>Who?</b> (Quem fará?)</p>
-                        <p class="mb-2"><b>Where?</b> (Onde será feito?)</p>
-                        <p class="mb-2"><b>When?</b> (Quando será feito?)</p>
-                        <p class="mb-2"><b>How?</b> (Como será feito?)</p>
-                        <p><b>How Much?</b> (Quanto custará/tempo levará?)</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-slate-900 p-6 rounded-3xl text-slate-300 text-xs flex flex-col justify-center">
+                            <p class="mb-2"><b>What?</b> (O que será feito?)</p>
+                            <p class="mb-2"><b>Why?</b> (Por que fazer?)</p>
+                            <p class="mb-2"><b>Who?</b> (Quem fará?)</p>
+                            <p class="mb-2"><b>Where?</b> (Onde será feito?)</p>
+                            <p class="mb-2"><b>When?</b> (Quando será feito?)</p>
+                            <p class="mb-2"><b>How?</b> (Como será feito?)</p>
+                            <p><b>How Much?</b> (Quanto custará/tempo levará?)</p>
+                        </div>
+
+                        <div class="bg-indigo-50 border-2 border-dashed border-indigo-200 p-6 rounded-3xl">
+                            <h4 class="font-bold text-indigo-600 uppercase text-[10px] mb-4 tracking-widest">Exemplo Prático: Banner Rotativo</h4>
+                            <ul class="space-y-2 text-xs text-slate-700">
+                                <li><b>What:</b> Componente de Banner Rotativo (Hero Section).</li>
+                                <li><b>Why:</b> Destacar promoções e aumentar conversão.</li>
+                                <li><b>How:</b> HTML5 Semântico, Flexbox e Tailwind CSS.</li>
+                                <li><b>When:</b> Até o fim do dia.</li>
+                                <li><b>How Much:</b> 1h 30min (Dev + Imagens).</li>
+                            </ul>
+                        </div>
                     </div>
                 `
             },
