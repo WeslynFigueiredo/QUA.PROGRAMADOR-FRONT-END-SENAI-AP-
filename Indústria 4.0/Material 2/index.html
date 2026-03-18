@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indústria 4.0 | Material 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Inter:wght@300;400;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: slideIn 0.4s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-bar { transition: width 0.4s ease; }
+        .bg-tech-2 { background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+
+    <!-- Header Fixo -->
+    <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b border-slate-200 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-tech-2 rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-900 leading-none">Indústria 4.0</h1>
+                    <p class="text-[10px] text-cyan-600 font-bold uppercase tracking-widest mt-1">Front-End | SENAI-AP</p>
+                </div>
+            </div>
+            <div class="flex-1 max-w-xs mx-8 hidden sm:block">
+                <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div id="progressBar" class="progress-bar h-full bg-cyan-600 w-0"></div>
+                </div>
+            </div>
+            <div id="pageIndicator" class="text-sm font-black text-cyan-600 bg-cyan-50 px-3 py-1 rounded-full">01/30</div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="mt-24 mb-32 max-w-4xl mx-auto px-6">
+        <div id="contentTarget"></div>
+    </main>
+
+    <!-- Navegação Inferior -->
+    <footer class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <button id="prevBtn" onclick="changePage(-1)" class="flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-slate-400 hover:text-cyan-600 transition disabled:opacity-0">
+                Anterior
+            </button>
+            <div id="dotNav" class="hidden sm:flex gap-1.5"></div>
+            <button id="nextBtn" onclick="changePage(1)" class="px-8 py-3 bg-cyan-600 text-white rounded-2xl font-bold hover:bg-cyan-700 shadow-xl transition-all active:scale-95">
+                Próxima
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        const pages = [
+            {
+                title: "Bem-vindo, Dev!",
+                content: `
+                    <div class="text-center py-12">
+                        <span class="bg-cyan-100 text-cyan-700 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Material 2</span>
+                        <h2 class="text-5xl font-extrabold text-slate-900 mt-6 mb-4 leading-tight">Robótica, IA e Realidade Aumentada</h2>
+                        <p class="text-xl text-slate-500 max-w-xl mx-auto">Hoje vamos sair da teoria das revoluções e ver como as ferramentas inteligentes funcionam na prática.</p>
+                        <div class="mt-12 p-8 bg-tech-2 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden text-left">
+                            <h4 class="font-bold text-cyan-100 uppercase text-[10px] mb-4 tracking-tighter">O Menu de Hoje:</h4>
+                            <div class="grid gap-4">
+                                <div class="flex gap-3">
+                                    <span class="bg-white/20 p-2 rounded-lg">🤖</span>
+                                    <p class="text-sm font-medium"><b>IA e Robótica:</b> O cérebro e os braços da indústria.</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <span class="bg-white/20 p-2 rounded-lg">👓</span>
+                                    <p class="text-sm font-medium"><b>Realidade Aumentada:</b> Interfaces que pulam da tela.</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <span class="bg-white/20 p-2 rounded-lg">🏭</span>
+                                    <p class="text-sm font-medium"><b>Missão 02:</b> O site da fábrica de tênis inteligente.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "O que é IA de verdade?",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">01. Inteligência Artificial (IA)</h2>
+                    <p class="mb-6 leading-relaxed">Muitos acham que IA é um robô malvado, mas na verdade é apenas **matemática muito rápida**. </p>
+                    <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-cyan-600 mb-2 underline">Analogia Simples:</h4>
+                        <p class="text-sm text-slate-600 italic leading-relaxed">"A IA é como um aluno que leu todos os livros da biblioteca. Quando você pergunta algo, ele não 'pensa' como um humano, ele tenta adivinhar a resposta mais lógica com base no que leu."</p>
+                    </div>
+                `
+            },
+            {
+                title: "Como a IA aprende?",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">02. Como o computador aprende?</h2>
+                    <p class="mb-4">Imagine como o Netflix ou o Spotify sugerem o que você gosta. </p>
+                    <ul class="space-y-4">
+                        <li class="p-4 bg-slate-100 rounded-2xl flex gap-3">
+                            <span class="font-bold text-cyan-600">1. Dados:</span> Você ouve 10 músicas de Rock.
+                        </li>
+                        <li class="p-4 bg-slate-100 rounded-2xl flex gap-3">
+                            <span class="font-bold text-cyan-600">2. Padrão:</span> A IA nota que as músicas têm guitarras e batida rápida.
+                        </li>
+                        <li class="p-4 bg-slate-100 rounded-2xl flex gap-3">
+                            <span class="font-bold text-cyan-600">3. Sugestão:</span> Ela sugere uma 11ª música com o mesmo estilo.
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                title: "IA no Front-End",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">03. IA e o seu Código</h2>
+                    <p class="mb-4 leading-relaxed">Para você, Dev, a IA é como um **estagiário infinito**. Ela ajuda a completar o seu código e achar erros antes de você clicar em 'Salvar'.</p>
+                    <div class="p-6 bg-slate-900 rounded-3xl border border-slate-700 shadow-xl">
+                        <p class="text-xs text-cyan-400 mb-4 font-mono">// IA sugerindo código:</p>
+                        <code class="text-slate-300 text-sm block leading-relaxed font-mono">
+                            Funcao criarBotaoVerde() <br>
+                            &nbsp;&nbsp;botao.estilo <- "cor-verde" <br>
+                            &nbsp;&nbsp;<span class="text-cyan-500 font-bold border-b border-cyan-500">botao.texto <- "Confirmar" // IA sugeriu isso</span><br>
+                            FimFuncao
+                        </code>
+                    </div>
+                `
+            },
+            {
+                title: "Desafio Rápido: IA",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">04. ⚡ DESAFIO: IA Detetive</h2>
+                    <div class="p-8 bg-cyan-50 border-2 border-cyan-200 rounded-3xl">
+                        <p class="text-sm mb-4">Pense em um site de compras (como a Amazon). </p>
+                        <p class="font-bold text-cyan-800">Pergunta:</p>
+                        <p class="text-sm italic mb-4">"Onde a IA está escondida na página que o usuário vê?"</p>
+                        <ul class="text-xs space-y-2 text-cyan-700">
+                            <li>[ ] Na barra de busca (completando o que você escreve).</li>
+                            <li>[ ] Nos produtos sugeridos ("Quem comprou isso, também levou...").</li>
+                            <li>[ ] No chat de suporte automático.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "IA na Fábrica",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">05. IA: O Cérebro da Fábrica</h2>
+                    <p class="mb-4">Na Indústria 4.0, a IA não sugere filmes, sugere **consertos**.</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-white border border-slate-200 rounded-2xl text-center shadow-sm">
+                            <h4 class="font-bold text-red-500 text-xs uppercase mb-2">Manutenção Reativa</h4>
+                            <p class="text-[10px]">A máquina quebra -> Você conserta. (Indústria Antiga)</p>
+                        </div>
+                        <div class="p-4 bg-white border border-slate-200 rounded-2xl text-center shadow-sm">
+                            <h4 class="font-bold text-cyan-500 text-xs uppercase mb-2">Manutenção Preditiva</h4>
+                            <p class="text-[10px]">A IA avisa que vai quebrar -> Você evita o erro. (Indústria 4.0)</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Robótica: Os Braços",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">06. Robótica: Mais que Braços de Ferro</h2>
+                    <p class="mb-4">Se a IA é o cérebro, a robótica são os braços. Mas esqueça aqueles robôs de filme que querem dominar o mundo.</p>
+                    <div class="p-6 bg-slate-100 rounded-3xl">
+                        <h4 class="font-bold text-slate-700 mb-2">Definição 4.0:</h4>
+                        <p class="text-sm leading-relaxed">Robôs hoje são máquinas precisas, conectadas à internet e que podem ser controladas por um **Site** (o site que você vai fazer!).</p>
+                    </div>
+                `
+            },
+            {
+                title: "Robôs: Antigo vs Novo",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">07. Robôs: A Grande Mudança</h2>
+                    <div class="overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr><th class="p-4">Característica</th><th class="p-4">Robô Antigo</th><th class="p-4">Robô 4.0</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr><td class="p-4 font-bold">Segurança</td><td class="p-4">Fica em jaulas (perigoso)</td><td class="p-4 text-cyan-600 font-bold">Trabalha ao seu lado</td></tr>
+                                <tr><td class="p-4 font-bold">Programação</td><td class="p-4">Linhas complexas de código</td><td class="p-4 text-cyan-600 font-bold">Fácil, até por tablet/site</td></tr>
+                                <tr><td class="p-4 font-bold">Nome</td><td class="p-4">Robô Industrial</td><td class="p-4 text-cyan-600 font-bold">Cobot (Robô Colaborativo)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                title: "Cobots: Seus Colegas",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">08. Conheça o 'Cobot'</h2>
+                    <p class="mb-6">O nome vem de **Co**llaborative Ro**bot**. Eles têm sensores de pele sensível: se ele encostar em você, ele para na hora.</p>
+                    <div class="p-8 bg-cyan-900 text-white rounded-[2.5rem] relative overflow-hidden">
+                        <p class="text-lg font-light mb-4">Imagine que você está codando e um braço mecânico te entrega um café quando nota que você está cansado.</p>
+                        <p class="text-xs font-bold uppercase text-cyan-300">Isso é Colaboração Homem-Máquina.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Robótica e Front-End",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">09. Como o Front-End controla robôs?</h2>
+                    <p class="mb-4">O robô não entende HTML, mas ele entende **Dados**. </p>
+                    <div class="p-6 bg-white border border-slate-200 rounded-3xl">
+                        <p class="text-sm text-slate-600">Você cria um botão no seu site. Ao clicar, o site envia uma mensagem para a "Nuvem", que envia um comando para o motor do robô.</p>
+                        <div class="flex justify-between items-center mt-6 px-4">
+                            <span class="text-xs font-bold p-2 bg-slate-100 rounded">BOTÃO NO SITE</span>
+                            <span class="text-slate-300">→</span>
+                            <span class="text-xs font-bold p-2 bg-slate-100 rounded">INTERNET</span>
+                            <span class="text-slate-300">→</span>
+                            <span class="text-xs font-bold p-2 bg-cyan-600 text-white rounded shadow-lg">ROBÔ MOVE</span>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Dica: Robótica Local",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">10. 💡 Dica: Santana/Macapá</h2>
+                    <div class="p-8 bg-amber-50 rounded-[2.5rem] border-2 border-amber-200">
+                        <h4 class="font-bold text-amber-900 mb-2">Logística e Robótica</h4>
+                        <p class="text-sm text-amber-800 leading-relaxed">No **Porto de Santana**, a robótica está chegando na forma de guindastes automáticos. Sabe quem cria a tela que o operador usa para monitorar esses guindastes lá no Amapá? **Desenvolvedores Front-End**.</p>
+                        <p class="mt-4 text-xs font-bold text-amber-600">É um mercado que paga muito bem e está aqui do lado!</p>
+                    </div>
+                `
+            },
+            {
+                title: "Realidade Aumentada (RA)",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">11. Realidade Aumentada (RA)</h2>
+                    <p class="mb-4 leading-relaxed">Se você já usou um filtro de "cachorrinho" no Instagram, você já usou Realidade Aumentada. </p>
+                    <div class="p-8 bg-indigo-600 text-white rounded-3xl text-center shadow-2xl">
+                        <p class="text-2xl font-bold mb-2">"RA é colocar um adesivo digital em cima do mundo real."</p>
+                        <p class="text-sm opacity-80">Diferente da Realidade Virtual (onde você fica cego para o mundo), na RA você ainda vê a sala ao seu redor.</p>
+                    </div>
+                `
+            },
+            {
+                title: "RA na Indústria",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">12. RA no Chão de Fábrica</h2>
+                    <p class="mb-6">Imagine um técnico que precisa consertar um cano vazando. Ele usa óculos especiais ou um tablet:</p>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-white border border-slate-200 rounded-2xl flex items-center gap-4">
+                            <div class="text-2xl">📸</div>
+                            <p class="text-sm">A câmera vê o cano.</p>
+                        </div>
+                        <div class="p-4 bg-white border border-slate-200 rounded-2xl flex items-center gap-4">
+                            <div class="text-2xl">⚡</div>
+                            <p class="text-sm font-bold text-cyan-600">O seu código desenha uma seta vermelha indicando onde apertar o parafuso.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Realidade Virtual (RV)",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">13. Realidade Virtual (RV)</h2>
+                    <p class="mb-4">Aqui você entra 100% num mundo digital. É ótimo para **Treinamentos**.</p>
+                    <div class="p-6 bg-slate-100 rounded-3xl italic">
+                        "É muito melhor um estagiário errar a montagem de uma turbina de avião no mundo virtual do que estragar uma peça de 1 milhão de reais no mundo real."
+                    </div>
+                `
+            },
+            {
+                title: "O Futuro das Interfaces",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">14. Além da Tela: Spatial UI</h2>
+                    <p class="mb-4 leading-relaxed">Como Dev Front-End, você não vai mais desenhar apenas para telas de celular retangulares. </p>
+                    <p class="font-bold text-indigo-600 mb-2">O Futuro:</p>
+                    <p class="text-sm text-slate-600">Interfaces flutuando no ar, que o usuário controla com o olhar ou gestos das mãos. Isso se chama **Interface Espacial**.</p>
+                </div>
+                `
+            },
+            {
+                title: "Tecnologias para RA no Web",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">15. RA no Navegador? Sim!</h2>
+                    <p class="mb-4">Você sabia que dá para fazer RA direto no Chrome usando o **WebXR**? </p>
+                    <div class="p-6 bg-slate-900 rounded-2xl">
+                        <p class="text-xs text-emerald-400 mb-4 font-mono">// Como o dev imagina o futuro:</p>
+                        <code class="text-slate-300 text-sm block leading-relaxed font-mono">
+                            Se usuario.olharPara(objetoReal) Entao<br>
+                            &nbsp;&nbsp;desenharInfoDigital(objetoReal.posicao)<br>
+                            FimSe
+                        </code>
+                    </div>
+                `
+            },
+            {
+                title: "Digital Twins: Prática",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">16. Gêmeos Digitais na Prática</h2>
+                    <p class="mb-4">Lembra que falamos dos Gêmeos Digitais? Eles são a base para a RA. </p>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                        <p class="text-sm text-slate-600">Se você tem o modelo 3D da máquina no site, você pode comparar em tempo real se a máquina real está se movendo igual ao "gêmeo" digital.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Manufatura Aditiva (3D)",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">17. Impressão 3D e o Site</h2>
+                    <p class="mb-4 leading-relaxed">Na Indústria 4.0, o cliente entra no seu site, desenha uma peça simples e clica em "Imprimir". A impressora 3D da fábrica começa a trabalhar na hora.</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase mt-4 italic">Você é a ponte entre o desejo do cliente e a fabricação física.</p>
+                `
+            },
+            {
+                title: "Missão 02: Tênis 4.0",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">18. ⚡ MISSÃO INTERATIVA 02</h2>
+                    <div class="p-8 bg-cyan-50 border-4 border-dashed border-cyan-200 rounded-[2rem]">
+                        <p class="font-bold text-cyan-800 text-lg mb-4 text-center">O Site do Futuro</p>
+                        <p class="text-sm text-cyan-900 mb-6 leading-relaxed">Imagine que você está criando um site para uma fábrica de tênis customizados em Macapá.</p>
+                        <p class="font-bold text-cyan-600 mb-2">O Desafio:</p>
+                        <p class="text-sm text-cyan-700 italic">"Como seria um botão que, ao ser clicado, abre uma janelinha mostrando o robô montando o tênis em tempo real (vídeo ou gêmeo digital)?"</p>
+                    </div>
+                `
+            },
+            {
+                title: "Ação: Desenhe o Painel",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">19. ✍️ AÇÃO: Rascunho do Painel</h2>
+                    <p class="mb-4 text-sm">Pegue papel e caneta. Desenhe um retângulo (seu site) e coloque:</p>
+                    <ul class="text-xs space-y-2 ml-4 list-disc text-slate-600">
+                        <li>Um gráfico de "Temperatura da Cola" (IA monitorando).</li>
+                        <li>Um botão "VER CÂMERA DO ROBÔ".</li>
+                        <li>Uma área para o cliente escolher a cor do tênis.</li>
+                    </ul>
+                    <p class="mt-6 text-sm font-bold text-cyan-600 uppercase">Isso é um Dashboard Industrial 4.0!</p>
+                `
+            },
+            {
+                title: "Monitoramento em Tempo Real",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">20. Tempo Real: A alma do negócio</h2>
+                    <p class="mb-4">Na Indústria 3.0, você via o relatório no fim do dia. Na 4.0, você vê o que está acontecendo **AGORA**.</p>
+                    <div class="p-6 bg-slate-900 rounded-3xl flex items-center justify-center gap-8">
+                        <div class="text-center">
+                            <p class="text-cyan-400 text-3xl font-bold animate-pulse">85%</p>
+                            <p class="text-white text-[10px]">EFICIÊNCIA ATUAL</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-emerald-400 text-3xl font-bold">ON</p>
+                            <p class="text-white text-[10px]">STATUS DO ROBÔ</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Cibersegurança em Robôs",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">21. Cibersegurança: Travando o Robô</h2>
+                    <p class="mb-4 leading-relaxed">Imagine se um hacker invade seu site e manda o robô da fábrica bater na parede. </p>
+                    <div class="p-6 bg-red-50 border border-red-100 rounded-3xl shadow-sm">
+                        <h4 class="font-bold text-red-800">Sua Missão como Dev:</h4>
+                        <p class="text-sm text-red-900">A segurança do site é o que garante que o robô físico não seja usado para causar acidentes.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Ética e IA",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">22. A IA pode errar?</h2>
+                    <p class="mb-4">Sim! Se os dados forem ruins, a IA vai dar sugestões ruins. </p>
+                    <p class="text-sm italic text-slate-500">Exemplo: Se você treina a IA da fábrica de tênis só com tênis azuis, ela vai achar que um tênis vermelho é um erro e vai jogar fora.</p>
+                    <p class="mt-4 font-bold">O Dev precisa "ensinar" a diversidade para a máquina.</p>
+                `
+            },
+            {
+                title: "Dica: Profissão do Futuro",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">23. 💡 Dica: Carreira</h2>
+                    <div class="p-8 bg-amber-50 rounded-[2.5rem] border-2 border-amber-200">
+                        <h4 class="font-bold text-amber-900 mb-2">Desenvolvedor de Interfaces Imersivas</h4>
+                        <p class="text-sm text-amber-800 leading-relaxed">O mercado de trabalho para quem sabe criar sites que usam Realidade Aumentada está explodindo. Grandes empresas de mineração no Amapá já usam tablets com RA para guiar os funcionários.</p>
+                        <p class="mt-4 text-xs font-bold text-amber-600">Aprender 3D básico (Three.js) vai te colocar no topo da lista!</p>
+                    </div>
+                `
+            },
+            {
+                title: "Customização em Massa: Prática",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">24. Customização via Front-End</h2>
+                    <p class="mb-4 leading-relaxed">No seu site, o usuário clica num "Seletor de Cores". Isso gera um arquivo digital (JSON) que vai direto para a impressora 3D ou para o braço do robô.</p>
+                    <div class="p-4 bg-slate-100 rounded-xl text-center text-xs font-bold text-slate-500 uppercase">
+                        Sua interface -> Hardware da Fábrica
+                    </div>
+                `
+            },
+            {
+                title: "O Papel do Humano 4.0",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">25. O Humano ainda importa?</h2>
+                    <p class="mb-4">Muito! As máquinas cuidam da força e da velocidade. O **Humano** cuida da:</p>
+                    <ul class="grid grid-cols-2 gap-3 text-sm">
+                        <li class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Criatividade</li>
+                        <li class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Ética</li>
+                        <li class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Lógica</li>
+                        <li class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Estratégia</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Eficiência e Energia",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">26. Fábrica Verde</h2>
+                    <p class="mb-4">Sensores de IoT monitoram se as máquinas estão esquentando demais e gastando muita luz. </p>
+                    <p class="text-sm text-cyan-700 font-bold">O Front-End exibe isso em um painel para que possamos economizar energia e salvar o planeta (e o dinheiro da empresa!).</p>
+                `
+            },
+            {
+                title: "Mito vs Verdade: Robôs",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">27. Mito vs Verdade</h2>
+                    <div class="p-6 bg-white rounded-3xl border border-slate-200">
+                        <p class="font-bold mb-2">"Vou perder meu emprego para a IA?"</p>
+                        <p class="text-sm text-slate-600"><b>Mito.</b> Você vai perder o emprego para o Desenvolvedor que sabe usar a IA. Ela é sua ferramenta, não sua substituta.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Quiz: Inteligência Artificial",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">28. Quiz - Parte I</h2>
+                    <p class="mb-4 font-medium">Qual a principal diferença entre Manutenção Reativa e Preditiva (com IA)?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-cyan-50 transition">A) A Reativa é mais rápida.</button>
+                        <button onclick="alert('Correto! A IA prevê o erro antes dele acontecer.')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-emerald-50 transition">B) A Preditiva evita que a máquina quebre avisando antes.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Quiz: Cobots",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">29. Quiz - Parte II</h2>
+                    <p class="mb-4 font-medium">O que caracteriza um Cobot (Robô Colaborativo)?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Correto! Eles são feitos para interagir com pessoas.')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-emerald-50 transition">A) Trabalha ao lado de humanos com segurança.</button>
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-red-50 transition">B) É um robô que não precisa de energia elétrica.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Fim do Material 2",
+                content: `
+                    <div class="text-center py-10">
+                        <div class="w-24 h-24 bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h2 class="text-4xl font-extrabold text-slate-900 mb-4">Material 2 Finalizado!</h2>
+                        <p class="text-slate-500 mb-8 max-w-sm mx-auto text-lg">Você agora entende como as tecnologias que pareciam "mágica" são ferramentas que você, como Dev, vai dominar.</p>
+                    </div>
+                `
+            }
+        ];
+
+        let currentPage = 0;
+
+        function renderPage() {
+            const container = document.getElementById('contentTarget');
+            const page = pages[currentPage];
+            
+            container.innerHTML = `
+                <div class="page-content active">
+                    <p class="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">${page.title}</p>
+                    ${page.content}
+                </div>
+            `;
+
+            const progress = ((currentPage + 1) / pages.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('pageIndicator').innerText = `${String(currentPage + 1).padStart(2, '0')}/${pages.length}`;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 0;
+            document.getElementById('nextBtn').innerText = currentPage === pages.length - 1 ? "Concluir Material 2" : "Próxima Página";
+            
+            window.scrollTo(0, 0);
+            updateDots();
+        }
+
+        function changePage(step) {
+            const next = currentPage + step;
+            if (next >= 0 && next < pages.length) {
+                currentPage = next;
+                renderPage();
+            } else if (next === pages.length) {
+                alert("Parabéns! Você concluiu as 8 horas iniciais de Indústria 4.0.");
+            }
+        }
+
+        function updateDots() {
+            const dotNav = document.getElementById('dotNav');
+            dotNav.innerHTML = '';
+            const start = Math.max(0, currentPage - 3);
+            const end = Math.min(pages.length, start + 7);
+
+            for (let i = 0; i < pages.length; i++) {
+                if (i >= start && i < end) {
+                    const dot = document.createElement('div');
+                    dot.className = `w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentPage ? 'bg-cyan-600 w-6' : 'bg-slate-300'}`;
+                    dotNav.appendChild(dot);
+                }
+            }
+        }
+
+        renderPage();
+    </script>
+</body>
+</html>
