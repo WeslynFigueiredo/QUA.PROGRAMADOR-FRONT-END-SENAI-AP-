@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indústria 4.0 | Material 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Inter:wght@300;400;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: slideIn 0.4s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-bar { transition: width 0.4s ease; }
+        .bg-tech { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+
+    <!-- Header Fixo -->
+    <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b border-slate-200 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-tech rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-900 leading-none">Indústria 4.0</h1>
+                    <p class="text-[10px] text-indigo-500 font-bold uppercase tracking-widest mt-1">Front-End | SENAI-AP</p>
+                </div>
+            </div>
+            <div class="flex-1 max-w-xs mx-8 hidden sm:block">
+                <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div id="progressBar" class="progress-bar h-full bg-indigo-600 w-0"></div>
+                </div>
+            </div>
+            <div id="pageIndicator" class="text-sm font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">01/30</div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="mt-24 mb-32 max-w-4xl mx-auto px-6">
+        <div id="contentTarget"></div>
+    </main>
+
+    <!-- Navegação Inferior -->
+    <footer class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <button id="prevBtn" onclick="changePage(-1)" class="flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-slate-400 hover:text-indigo-600 transition disabled:opacity-0">
+                Anterior
+            </button>
+            <div id="dotNav" class="hidden sm:flex gap-1.5"></div>
+            <button id="nextBtn" onclick="changePage(1)" class="px-8 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 shadow-xl transition-all active:scale-95">
+                Próxima
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        const pages = [
+            {
+                title: "Bem-vindo, Dev!",
+                content: `
+                    <div class="text-center py-12">
+                        <span class="bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Material 1</span>
+                        <h2 class="text-5xl font-extrabold text-slate-900 mt-6 mb-4 leading-tight">Fundamentos da Indústria 4.0</h2>
+                        <p class="text-xl text-slate-500 max-w-xl mx-auto">Prepare-se para entender como o código que você escreve hoje é o combustível das fábricas inteligentes de amanhã.</p>
+                        <div class="mt-12 p-8 bg-tech rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden">
+                            <div class="relative z-10">
+                                <h4 class="font-bold text-indigo-200 uppercase text-xs mb-2">O que você vai dominar:</h4>
+                                <p class="text-2xl font-semibold">A Revolução Digital sob o olhar de um desenvolvedor.</p>
+                            </div>
+                            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Analogia: A Evolução Gamer",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">01. Indústria vs Videogame</h2>
+                    <p class="mb-6 leading-relaxed">Para entender como chegamos aqui, imagine a evolução dos consoles. Cada geração mudou as regras do jogo, assim como as revoluções industriais.</p>
+                    <div class="grid gap-4">
+                        <div class="p-6 bg-white rounded-2xl border-l-4 border-slate-300 shadow-sm flex gap-4 items-center">
+                            <div class="text-3xl">🕹️</div>
+                            <div>
+                                <h4 class="font-bold">Indústria 1.0 = O Atari</h4>
+                                <p class="text-sm text-slate-500">Mecânico, básico, uma tarefa por vez. Vapor e máquinas simples.</p>
+                            </div>
+                        </div>
+                        <div class="p-6 bg-white rounded-2xl border-l-4 border-indigo-400 shadow-sm flex gap-4 items-center">
+                            <div class="text-3xl">🎮</div>
+                            <div>
+                                <h4 class="font-bold">Indústria 4.0 = VR & Cloud Gaming</h4>
+                                <p class="text-sm text-slate-500">Tudo conectado, tempo real, imersivo e inteligente.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "1ª Revolução: O Vapor",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">02. A 1ª Revolução (1780)</h2>
+                    <p class="mb-4">O homem parou de depender apenas da força dos animais e da própria mão para usar o **Vapor**.</p>
+                    <div class="p-6 bg-slate-100 rounded-3xl border border-slate-200">
+                        <h4 class="font-bold mb-2">Analogia Digital:</h4>
+                        <p class="text-sm">É como o primeiro computador que só servia para fazer contas básicas. Era lento, barulhento, mas mudou tudo.</p>
+                    </div>
+                    <p class="mt-6 text-xs text-slate-400 font-bold uppercase tracking-widest">Palavra-chave: Mecanização</p>
+                `
+            },
+            {
+                title: "2ª Revolução: A Eletricidade",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">03. A 2ª Revolução (1870)</h2>
+                    <p class="mb-4">Chegou a **Eletricidade** e a linha de montagem de Henry Ford. Agora podíamos fazer 1.000 itens iguais em vez de apenas 1.</p>
+                    <div class="p-6 bg-amber-50 rounded-3xl border border-amber-200">
+                        <h4 class="font-bold text-amber-800">Conexão Front-End:</h4>
+                        <p class="text-sm text-amber-900">É como se tivéssemos inventado o "Copiar e Colar". Em vez de escrever um site do zero para cada pessoa, começamos a criar estruturas que podiam ser replicadas.</p>
+                    </div>
+                `
+            },
+            {
+                title: "3ª Revolução: A Informática",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">04. A 3ª Revolução (1970)</h2>
+                    <p class="mb-4">Entram em cena os **Computadores** e os Chips (CLPs). As máquinas começaram a ser programadas para fazer o trabalho sozinhas.</p>
+                    <div class="bg-indigo-900 p-6 rounded-3xl text-white">
+                        <h4 class="font-bold text-indigo-300 mb-2">A Era do Dev:</h4>
+                        <p class="text-sm">Aqui nasceram os sites. Eram estáticos, como um panfleto digital. Você lia, mas não podia "conversar" com o site.</p>
+                    </div>
+                `
+            },
+            {
+                title: "4ª Revolução: A Inteligência",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">05. A 4ª Revolução (Hoje)</h2>
+                    <p class="mb-4">Não é apenas sobre computadores, é sobre **Conexão**. As fábricas agora têm "cérebro" e "sentidos" (sensores) e conversam entre si.</p>
+                    <div class="p-6 bg-emerald-50 border-2 border-emerald-200 rounded-3xl">
+                        <h4 class="font-bold text-emerald-800">O Front-End 4.0:</h4>
+                        <p class="text-sm text-emerald-900 font-medium">Hoje seu código controla drones, mostra a temperatura de uma fazenda em Macapá em tempo real e prevê quando uma máquina vai quebrar.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Tabela Comparativa",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">06. Antes vs. Agora</h2>
+                    <div class="overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr><th class="p-4">Característica</th><th class="p-4">Indústria 3.0</th><th class="p-4">Indústria 4.0</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr><td class="p-4 font-bold">Comunicação</td><td class="p-4 text-slate-500">Máquina isolada</td><td class="p-4 text-indigo-600 font-bold">Máquinas conectadas</td></tr>
+                                <tr><td class="p-4 font-bold">Decisão</td><td class="p-4 text-slate-500">Humano decide tudo</td><td class="p-4 text-indigo-600 font-bold">A máquina sugere/decide</td></tr>
+                                <tr><td class="p-4 font-bold">Sites</td><td class="p-4 text-slate-500">Apenas informação</td><td class="p-4 text-indigo-600 font-bold">Controle e tempo real</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                title: "Pilar 1: IoT",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">07. Pilar: Internet das Coisas (IoT)</h2>
+                    <p class="mb-4">Imagine dar vida a objetos inanimados. IoT é colocar sensores e internet em tudo: de lâmpadas a turbinas de avião.</p>
+                    <div class="p-6 bg-indigo-50 rounded-3xl border border-indigo-100">
+                        <h4 class="font-bold text-indigo-700">Explicação Simples:</h4>
+                        <p class="text-sm italic">"É quando sua geladeira percebe que o leite acabou e avisa o seu celular."</p>
+                    </div>
+                `
+            },
+            {
+                title: "IoT no Front-End",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">08. IoT e o Desenvolvedor</h2>
+                    <p class="mb-4">Como o Front-End entra nisso? Você é quem cria o **Painel de Controle** (Dashboard).</p>
+                    <div class="bg-slate-900 p-6 rounded-2xl">
+                        <p class="text-xs text-emerald-400 mb-4">// Pseudocódigo: Painel IoT</p>
+                        <code class="text-slate-300 text-sm block leading-relaxed">
+                            Se temperatura_sensor > 40 Entao<br>
+                            &nbsp;&nbsp;exibir_alerta("Fábrica está esquentando!")<br>
+                            &nbsp;&nbsp;botao_emergencia.cor <- "vermelho"<br>
+                            FimSe
+                        </code>
+                    </div>
+                `
+            },
+            {
+                title: "Pilar 2: Cloud Computing",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">09. Pilar: Computação em Nuvem</h2>
+                    <p class="mb-4">Você já ouviu falar de "Nuvem", mas o que é na real?</p>
+                    <div class="p-8 bg-blue-600 text-white rounded-[2.5rem] shadow-xl text-center">
+                        <p class="text-2xl font-bold mb-2">"A Nuvem é o computador de outra pessoa que você acessa pela internet."</p>
+                        <p class="text-sm opacity-80">Você não precisa mais de um super servidor na sua sala; você aluga um pedaço de um supercomputador do Google ou da Amazon.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Por que Nuvem é vital?",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">10. A Nuvem no dia a dia</h2>
+                    <p class="mb-6">Sem a nuvem, a Indústria 4.0 seria impossível. Imagine tentar guardar os dados de 1 milhão de sensores em um pendrive.</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl">
+                            <h4 class="font-bold text-xs uppercase text-blue-500 mb-1">Flexibilidade</h4>
+                            <p class="text-xs">Aumenta ou diminui o espaço conforme a necessidade.</p>
+                        </div>
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl">
+                            <h4 class="font-bold text-xs uppercase text-blue-500 mb-1">Acesso</h4>
+                            <p class="text-xs">Você vê os dados de Macapá morando em qualquer lugar do mundo.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Pilar 3: Big Data",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">11. Pilar: Big Data</h2>
+                    <p class="mb-4">É o volume gigantesco de informações que geramos a cada segundo. É "informação demais para um humano entender sozinho".</p>
+                    <div class="p-6 bg-slate-100 rounded-3xl border border-slate-200">
+                        <h4 class="font-bold mb-2">Os 3 V's do Big Data:</h4>
+                        <ul class="text-sm space-y-2">
+                            <li>📊 <b>Volume:</b> Muita coisa sendo gerada.</li>
+                            <li>⚡ <b>Velocidade:</b> Gerada em tempo real.</li>
+                            <li>🎭 <b>Variedade:</b> Fotos, textos, números de sensores.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "Big Data no Front-End",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">12. Traduzindo o Big Data</h2>
+                    <p class="mb-4">O Big Data entrega 1 bilhão de números. O Dev Front-End entrega um **Gráfico Lindo** que o gerente consegue entender em 1 segundo.</p>
+                    <div class="mt-6 flex justify-center">
+                        <div class="w-full max-w-xs h-32 bg-slate-200 rounded-xl flex items-end p-4 gap-2">
+                            <div class="bg-indigo-500 w-full h-[30%] rounded-t"></div>
+                            <div class="bg-indigo-500 w-full h-[60%] rounded-t"></div>
+                            <div class="bg-indigo-500 w-full h-[90%] rounded-t"></div>
+                            <div class="bg-indigo-500 w-full h-[50%] rounded-t"></div>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-center text-xs text-slate-500 italic">"Sua missão é transformar caos em clareza visual."</p>
+                `
+            },
+            {
+                title: "Missão: Objeto Inteligente",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">13. ⚡ MISSÃO INTERATIVA 01</h2>
+                    <div class="p-8 bg-indigo-50 border-4 border-dashed border-indigo-200 rounded-[2rem]">
+                        <p class="font-bold text-indigo-800 text-lg mb-4 text-center">O Objeto 4.0</p>
+                        <p class="text-sm text-indigo-900 mb-6">Olhe ao seu redor e escolha um objeto comum (uma garrafa de água, um grampeador, uma cadeira).</p>
+                        <p class="font-bold text-indigo-600 mb-2">Desafio de 5 minutos:</p>
+                        <p class="text-sm text-indigo-700 italic">"Se esse objeto tivesse um sensor e estivesse conectado ao seu site, que informação ele enviaria agora?"</p>
+                        <div class="mt-4 p-3 bg-white rounded-xl text-xs text-indigo-400">Exemplo: Garrafa enviando "Faltam 200ml para acabar" para um app de hidratação.</div>
+                    </div>
+                `
+            },
+            {
+                title: "Pilar 4: Cibersegurança",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">14. Pilar: Cibersegurança</h2>
+                    <p class="mb-4 leading-relaxed">Se tudo está conectado, tudo pode ser invadido. Proteger os dados da fábrica é tão importante quanto trancar o portão.</p>
+                    <div class="p-6 bg-red-50 border border-red-100 rounded-3xl">
+                        <h4 class="font-bold text-red-800">No seu site:</h4>
+                        <p class="text-sm text-red-900 font-medium">Você é responsável por garantir que apenas pessoas autorizadas acessem os controles das máquinas. Um bug no seu login pode parar uma fábrica inteira!</p>
+                    </div>
+                `
+            },
+            {
+                title: "Pilar 5: Realidade Aumentada",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">15. Pilar: Realidade Aumentada (RA)</h2>
+                    <p class="mb-4">É colocar elementos digitais por cima do mundo real. Lembra do Pokémon GO? É isso, mas na indústria.</p>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-6">
+                        <div class="text-4xl">👓</div>
+                        <p class="text-sm text-slate-600 font-medium">Um mecânico aponta o tablet para a máquina e o seu site mostra, por cima da imagem da câmera, onde está a peça que precisa de troca.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Sistemas Ciberfísicos",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">16. Sistemas Ciberfísicos</h2>
+                    <p class="mb-4">É quando o mundo físico (máquina) e o digital (seu código) se tornam uma coisa só. A máquina "sente" o ambiente e o código "age".</p>
+                    <div class="mt-4 p-4 bg-indigo-900 text-indigo-100 rounded-xl text-center font-bold">
+                        Físico + Digital = Inteligência
+                    </div>
+                `
+            },
+            {
+                title: "Gêmeos Digitais (Digital Twins)",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">17. Gêmeos Digitais</h2>
+                    <p class="mb-4">É criar uma cópia idêntica de uma máquina real dentro do computador. Tudo o que acontece na máquina real, acontece no "gêmeo" no seu site.</p>
+                    <p class="text-sm text-slate-500 italic">Serve para testar mudanças perigosas no digital antes de fazer no real.</p>
+                `
+            },
+            {
+                title: "IA na Indústria",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">18. Inteligência Artificial (IA)</h2>
+                    <p class="mb-4 leading-relaxed">A IA é o cérebro que analisa o Big Data e toma decisões. Ela aprende com os erros e acertos do passado.</p>
+                    <div class="p-6 bg-emerald-900 text-white rounded-3xl">
+                        <h4 class="font-bold mb-2 text-emerald-300 italic">Manutenção Preditiva:</h4>
+                        <p class="text-sm">A IA percebe que a máquina está vibrando diferente e avisa no seu dashboard: "Troque a peça X em 2 dias ou ela vai quebrar".</p>
+                    </div>
+                `
+            },
+            {
+                title: "Manufatura Aditiva (3D)",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">19. Impressão 3D</h2>
+                    <p class="mb-4">Indústria 4.0 também é construir objetos camada por camada. Em vez de esculpir uma peça, nós a "imprimimos" em metal ou plástico.</p>
+                    <p class="text-xs text-slate-400 font-bold uppercase mt-4">Vantagem: Menos desperdício de material.</p>
+                `
+            },
+            {
+                title: "Dica: Macapá 4.0",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">20. 💡 Dica: Nossa Região</h2>
+                    <div class="p-8 bg-amber-50 rounded-[2.5rem] border-2 border-amber-200">
+                        <h4 class="font-bold text-amber-900 mb-2">Amapá e a Tecnologia</h4>
+                        <p class="text-sm text-amber-800 leading-relaxed">Macapá tem um potencial gigante para a Indústria 4.0, principalmente no **Porto de Santana**. O rastreamento de cargas via IoT e o controle logístico são as maiores portas de entrada para novos Devs aqui na região.</p>
+                        <p class="mt-4 text-xs font-bold text-amber-600">Fique de olho: Empresas de logística precisam de dashboards!</p>
+                    </div>
+                `
+            },
+            {
+                title: "Integração Vertical e Horizontal",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">21. Sistemas Integrados</h2>
+                    <p class="mb-4">Na Indústria 4.0, a fábrica não está sozinha. Ela fala com o fornecedor e com o cliente ao mesmo tempo.</p>
+                    <ul class="space-y-3 text-sm">
+                        <li>🔗 <b>Vertical:</b> Do chão da fábrica até o dono da empresa.</li>
+                        <li>🌐 <b>Horizontal:</b> De uma fábrica para outra ao redor do mundo.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Cobots: Robôs Colaborativos",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">22. Conheça os Cobots</h2>
+                    <p class="mb-4">Antigamente, robôs ficavam em jaulas porque eram perigosos. Hoje, os **Cobots** trabalham lado a lado com humanos. Eles têm sensores que param o movimento se você encostar neles.</p>
+                `
+            },
+            {
+                title: "Eficiência Energética",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">23. Sustentabilidade 4.0</h2>
+                    <p class="mb-4 leading-relaxed">Uma fábrica 4.0 é mais verde. Ela desliga luzes sozinhas, usa energia de forma inteligente e desperdiça menos água porque os sensores controlam tudo com precisão milimétrica.</p>
+                `
+            },
+            {
+                title: "O Mercado Amapaense",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">24. 💡 Dica: Oportunidades</h2>
+                    <p class="mb-4">Muitos alunos acham que precisam sair do Amapá para trabalhar com Indústria 4.0. **Mentira!**</p>
+                    <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+                        <p class="text-sm text-slate-600 font-medium italic">Empresas locais de bioeconomia (produtos da floresta) estão começando a usar sensores para monitorar a colheita do açaí e óleos essenciais. Eles precisam de Devs Front-End para criar interfaces que os produtores possam usar no campo!</p>
+                    </div>
+                `
+            },
+            {
+                title: "Customização em Massa",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">25. Um produto para cada um</h2>
+                    <p class="mb-4 leading-relaxed">Na Indústria 2.0, você comprava o que tinha. Na 4.0, você entra num site, escolhe as cores e o tamanho do seu tênis, e a fábrica produz um **único par exclusivo** para você de forma automática.</p>
+                `
+            },
+            {
+                title: "A Revolução do Trabalho",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">26. O papel do Humano</h2>
+                    <p class="mb-4 leading-relaxed">As máquinas não vão substituir o humano, elas vão substituir o trabalho repetitivo. O humano 4.0 é quem **resolve problemas e cria a lógica** (Sim, é VOCÊ, o Dev!).</p>
+                `
+            },
+            {
+                title: "Quiz: Evolução",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">27. Quiz Rápido I</h2>
+                    <p class="mb-4 font-medium">Qual era a principal fonte de energia da 1ª Revolução Industrial?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-indigo-50 transition">A) Eletricidade.</button>
+                        <button onclick="alert('Correto! O vapor movia as primeiras máquinas.')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-emerald-50 transition">B) Vapor.</button>
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-red-50 transition">C) Pilhas de Lítio.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Quiz: IoT",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">28. Quiz Rápido II</h2>
+                    <p class="mb-4 font-medium">O que é a Internet das Coisas (IoT)?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Correto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-emerald-50 transition">A) Conectar objetos do dia a dia à internet.</button>
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-red-50 transition">B) Um site para comprar coisas usadas.</button>
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-red-50 transition">C) Jogar videogame online.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Quiz: Cloud",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">29. Quiz Rápido III</h2>
+                    <p class="mb-4 font-medium">Onde fica "guardada" a informação na Indústria 4.0?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-red-50 transition">A) Em disquetes guardados no cofre.</button>
+                        <button onclick="alert('Correto! A Nuvem permite acesso global.')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-emerald-50 transition">B) Na Computação em Nuvem.</button>
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-red-50 transition">C) Apenas na memória RAM do robô.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Final do Material 1",
+                content: `
+                    <div class="text-center py-10">
+                        <div class="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h2 class="text-4xl font-extrabold text-slate-900 mb-4">Material 1 Concluído!</h2>
+                        <p class="text-slate-500 mb-8 max-w-sm mx-auto text-lg">Você acaba de dar o primeiro passo para se tornar um desenvolvedor preparado para a Transformação Digital.</p>
+                    </div>
+                `
+            }
+        ];
+
+        let currentPage = 0;
+
+        function renderPage() {
+            const container = document.getElementById('contentTarget');
+            const page = pages[currentPage];
+            
+            container.innerHTML = `
+                <div class="page-content active">
+                    <p class="text-xs font-black text-indigo-400 uppercase tracking-[0.2em] mb-3">${page.title}</p>
+                    ${page.content}
+                </div>
+            `;
+
+            const progress = ((currentPage + 1) / pages.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('pageIndicator').innerText = `${String(currentPage + 1).padStart(2, '0')}/${pages.length}`;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 0;
+            document.getElementById('nextBtn').innerText = currentPage === pages.length - 1 ? "Concluir Dia 1" : "Próxima Página";
+            
+            window.scrollTo(0, 0);
+            updateDots();
+        }
+
+        function changePage(step) {
+            const next = currentPage + step;
+            if (next >= 0 && next < pages.length) {
+                currentPage = next;
+                renderPage();
+            } else if (next === pages.length) {
+                alert("Parabéns! Você concluiu as primeiras 4 horas de fundamentos da Indústria 4.0.");
+            }
+        }
+
+        function updateDots() {
+            const dotNav = document.getElementById('dotNav');
+            dotNav.innerHTML = '';
+            const start = Math.max(0, currentPage - 3);
+            const end = Math.min(pages.length, start + 7);
+
+            for (let i = 0; i < pages.length; i++) {
+                if (i >= start && i < end) {
+                    const dot = document.createElement('div');
+                    dot.className = `w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentPage ? 'bg-indigo-600 w-6' : 'bg-slate-300'}`;
+                    dotNav.appendChild(dot);
+                }
+            }
+        }
+
+        renderPage();
+    </script>
+</body>
+</html>
