@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indústria 4.0 | Material 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Inter:wght@300;400;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: slideIn 0.4s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-bar { transition: width 0.4s ease; }
+        .bg-tech-3 { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+
+    <!-- Header Fixo -->
+    <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b border-slate-200 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-tech-3 rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-900 leading-none">Sociedade 5.0</h1>
+                    <p class="text-[10px] text-purple-600 font-bold uppercase tracking-widest mt-1">Front-End | SENAI-AP</p>
+                </div>
+            </div>
+            <div class="flex-1 max-w-xs mx-8 hidden sm:block">
+                <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div id="progressBar" class="progress-bar h-full bg-purple-600 w-0"></div>
+                </div>
+            </div>
+            <div id="pageIndicator" class="text-sm font-black text-purple-600 bg-purple-50 px-3 py-1 rounded-full">01/30</div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="mt-24 mb-32 max-w-4xl mx-auto px-6">
+        <div id="contentTarget"></div>
+    </main>
+
+    <!-- Navegação Inferior -->
+    <footer class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <button id="prevBtn" onclick="changePage(-1)" class="flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-slate-400 hover:text-purple-600 transition disabled:opacity-0">
+                Anterior
+            </button>
+            <div id="dotNav" class="hidden sm:flex gap-1.5"></div>
+            <button id="nextBtn" onclick="changePage(1)" class="px-8 py-3 bg-purple-600 text-white rounded-2xl font-bold hover:bg-purple-700 shadow-xl transition-all active:scale-95">
+                Próxima
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        const pages = [
+            {
+                title: "Bem-vindo, Dev!",
+                content: `
+                    <div class="text-center py-12">
+                        <span class="bg-purple-100 text-purple-700 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Material 3</span>
+                        <h2 class="text-5xl font-extrabold text-slate-900 mt-6 mb-4 leading-tight">Sociedade 5.0: Tecnologia para Humanos</h2>
+                        <p class="text-xl text-slate-500 max-w-xl mx-auto">Aprendemos sobre máquinas e dados. Agora, vamos aprender sobre **pessoas** e o seu papel nesse novo mundo.</p>
+                        <div class="mt-12 p-8 bg-tech-3 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden text-left">
+                            <h4 class="font-bold text-purple-100 uppercase text-[10px] mb-4 tracking-tighter">O Que Veremos:</h4>
+                            <div class="grid gap-4">
+                                <div class="flex gap-3">
+                                    <span class="bg-white/20 p-2 rounded-lg">🧠</span>
+                                    <p class="text-sm font-medium"><b>Soft Skills:</b> Por que ser legal e criativo é o seu maior trunfo.</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <span class="bg-white/20 p-2 rounded-lg">🛡️</span>
+                                    <p class="text-sm font-medium"><b>Ética e Segurança:</b> Protegendo quem usa seu site.</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <span class="bg-white/20 p-2 rounded-lg">🚀</span>
+                                    <p class="text-sm font-medium"><b>Pitch de Inovação:</b> Resolvendo problemas reais de Macapá.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "O que é Sociedade 5.0?",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">01. Além das Fábricas: Sociedade 5.0</h2>
+                    <p class="mb-6 leading-relaxed">Se a Indústria 4.0 foca na **eficiência das máquinas**, a Sociedade 5.0 foca no **bem-estar do ser humano**.</p>
+                    <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-purple-600 mb-2 underline">Analogia Gamer:</h4>
+                        <p class="text-sm text-slate-600 italic leading-relaxed">"Indústria 4.0 é como ter o melhor console e os melhores gráficos. Sociedade 5.0 é usar esses gráficos para criar uma comunidade incrível onde todos se ajudam e ninguém fica para trás."</p>
+                    </div>
+                `
+            },
+            {
+                title: "O Humano no Centro",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">02. O Ser Humano no Controle</h2>
+                    <p class="mb-4">Na Sociedade 5.0, a tecnologia resolve problemas sociais:</p>
+                    <ul class="space-y-4">
+                        <li class="p-4 bg-purple-50 rounded-2xl flex gap-3 border border-purple-100">
+                            <span class="font-bold text-purple-600">Saúde:</span> Sensores que avisam o médico antes de você passar mal.
+                        </li>
+                        <li class="p-4 bg-purple-50 rounded-2xl flex gap-3 border border-purple-100">
+                            <span class="font-bold text-purple-600">Mobilidade:</span> Ônibus que chegam na hora porque o trânsito é inteligente.
+                        </li>
+                        <li class="p-4 bg-purple-50 rounded-2xl flex gap-3 border border-purple-100">
+                            <span class="font-bold text-purple-600">Idosos:</span> Robôs que ajudam quem mora sozinho.
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                title: "O Profissional 4.0",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">03. O Profissional 4.0</h2>
+                    <p class="mb-4 leading-relaxed">O mercado não busca mais quem apenas "sabe fazer". Ele busca quem **sabe aprender** e **sabe conviver**.</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-white border border-slate-200 rounded-2xl text-center shadow-sm">
+                            <h4 class="font-bold text-slate-800 text-xs uppercase mb-2">Hard Skills</h4>
+                            <p class="text-[10px] text-slate-500">Saber HTML, CSS, JavaScript, Frameworks. (O que você faz).</p>
+                        </div>
+                        <div class="p-4 bg-purple-600 rounded-2xl text-center shadow-lg">
+                            <h4 class="font-bold text-white text-xs uppercase mb-2">Soft Skills</h4>
+                            <p class="text-[10px] text-purple-100">Comunicação, empatia, criatividade. (Como você é).</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Desafio: Suas Habilidades",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">04. ⚡ DESAFIO: Mapa de Habilidades</h2>
+                    <div class="p-8 bg-purple-50 border-2 border-purple-200 rounded-3xl">
+                        <p class="text-sm mb-4">Pense no seu trabalho em equipe no SENAI.</p>
+                        <p class="font-bold text-purple-800">Qual dessas é sua maior força hoje?</p>
+                        <ul class="text-xs space-y-2 text-purple-700 mt-4">
+                            <li>[ ] <b>Iniciativa:</b> Começo a codar antes de todos.</li>
+                            <li>[ ] <b>Mediação:</b> Ajudo meus colegas a não brigarem por causa de código.</li>
+                            <li>[ ] <b>Inovação:</b> Sempre tenho uma ideia diferente para o layout.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "Colaboração via Chat/Vídeo",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">05. Trabalho Remoto e Colaborativo</h2>
+                    <p class="mb-6 leading-relaxed">Na Indústria 4.0, você pode morar em Macapá e trabalhar para uma empresa em Tóquio. Mas para isso, precisa dominar o **Trabalho em Equipe Digital**.</p>
+                    <div class="bg-slate-900 text-white p-6 rounded-3xl">
+                        <h4 class="text-purple-400 font-bold mb-4">Regras do Dev Colaborativo:</h4>
+                        <ul class="text-sm space-y-3">
+                            <li class="flex gap-2"><span>✅</span> Documente seu código (README).</li>
+                            <li class="flex gap-2"><span>✅</span> Seja claro nas reuniões de vídeo.</li>
+                            <li class="flex gap-2"><span>✅</span> Não tenha medo de pedir ajuda no Slack/Discord.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "Ação: Empatia no Código",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">06. ✍️ AÇÃO: O Código é de Todos</h2>
+                    <p class="mb-4">Imagine que seu colega vai continuar o site que você começou. </p>
+                    <div class="p-6 bg-white border border-slate-200 rounded-3xl">
+                        <p class="text-sm text-slate-600 font-medium">Escreva em um papel (ou bloco de notas) um pequeno "bilhete digital" explicando para ele onde está o botão principal e por que você escolheu a cor roxa.</p>
+                        <p class="mt-4 text-xs font-bold text-purple-600 italic">Isso é Soft Skill aplicada à produtividade!</p>
+                    </div>
+                `
+            },
+            {
+                title: "Ética na Era dos Dados",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">07. Ética e Segurança Digital</h2>
+                    <p class="mb-4">Como Dev Front-End, você lida com formulários. Pessoas digitam nomes, e-mails e senhas no **seu** site.</p>
+                    <div class="p-8 bg-red-600 text-white rounded-[2.5rem] shadow-xl text-center">
+                        <p class="text-2xl font-bold mb-2">"Com grandes dados, vem uma grande responsabilidade."</p>
+                        <p class="text-sm opacity-80">Proteger a privacidade não é só uma lei (LGPD), é um dever moral.</p>
+                    </div>
+                `
+            },
+            {
+                title: "O que é LGPD?",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">08. LGPD para Iniciantes</h2>
+                    <p class="mb-4 leading-relaxed">A Lei Geral de Proteção de Dados diz que o dono dos dados é o **Usuário**, não o dono do site.</p>
+                    <div class="p-6 bg-slate-100 rounded-3xl border border-slate-200">
+                        <h4 class="font-bold mb-2">3 Regras de Ouro:</h4>
+                        <ol class="text-sm space-y-2 list-decimal ml-4">
+                            <li>Peça permissão para guardar o dado.</li>
+                            <li>Explique para que você vai usar.</li>
+                            <li>Apague se o usuário pedir.</li>
+                        </ol>
+                    </div>
+                `
+            },
+            {
+                title: "Cibersegurança Prática",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">09. Protegendo seu Site</h2>
+                    <p class="mb-6">Cibersegurança não é só para hackers de cinema. No Front-End você faz o básico:</p>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+                            <h4 class="font-bold text-xs uppercase text-purple-600 mb-1">HTTPS</h4>
+                            <p class="text-[10px]">Criptografa a conversa entre o site e o usuário.</p>
+                        </div>
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+                            <h4 class="font-bold text-xs uppercase text-purple-600 mb-1">Validação</h4>
+                            <p class="text-[10px]">Não deixe o usuário digitar "lixo" no seu formulário.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Inovação no Amapá",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">10. 💡 Dica: Inovação Local</h2>
+                    <div class="p-8 bg-amber-50 rounded-[2.5rem] border-2 border-amber-200">
+                        <h4 class="font-bold text-amber-900 mb-2">Macapá Criativa</h4>
+                        <p class="text-sm text-amber-800 leading-relaxed">O Amapá tem problemas únicos (distâncias, logística fluvial, clima). Inovar aqui é olhar para esses problemas e pensar: **"Como um site e um sensor podem resolver isso?"**.</p>
+                        <p class="mt-4 text-xs font-bold text-amber-600 italic">O mercado amapaense valoriza quem traz soluções práticas, não quem apenas segue tutoriais.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Pitch de Inovação: O que é?",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">11. O Poder do 'Pitch'</h2>
+                    <p class="mb-4">Um **Pitch** é uma apresentação curta (3 a 5 minutos) para convencer alguém de que sua ideia é boa.</p>
+                    <div class="bg-indigo-900 text-white p-6 rounded-3xl">
+                        <h4 class="text-indigo-300 font-bold mb-4 italic">A Estrutura de um Pitch Campeão:</h4>
+                        <p class="text-sm">1. **Problema:** O que está doendo no mundo?</p>
+                        <p class="text-sm">2. **Solução:** Como seu site/app resolve isso?</p>
+                        <p class="text-sm">3. **Tecnologia:** Que pilar da Indústria 4.0 você usou?</p>
+                    </div>
+                `
+            },
+            {
+                title: "Desafio Final: Pitch I",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">12. 🚀 MISSÃO: Parte I</h2>
+                    <div class="p-8 bg-purple-50 border-4 border-dashed border-purple-200 rounded-[2rem]">
+                        <p class="font-bold text-purple-800 text-lg mb-4 text-center">Identificando o Problema</p>
+                        <p class="text-sm text-purple-900 mb-6 leading-relaxed">Escolha um problema real de Macapá ou Santana. </p>
+                        <p class="font-bold text-purple-600 mb-2">Exemplos sugeridos:</p>
+                        <ul class="text-xs space-y-2 text-purple-700 italic">
+                            <li>- Demora infinita no ônibus.</li>
+                            <li>- Falta de luz que estraga comida na geladeira.</li>
+                            <li>- Dificuldade de saber onde tem açaí fresco agora.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "Desafio Final: Pitch II",
+                content: `
+                    <h2 class="text-3xl font-extrabold mb-6">13. 🚀 MISSÃO FINAL: Parte II</h2>
+                    <p class="mb-4 text-slate-600">Agora, usem os pilares da Indústria 4.0 para resolver. </p>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                        <p class="text-sm font-bold mb-2">Pergunta:</p>
+                        <p class="text-sm italic text-slate-500">"Como um **Sensor (IoT)** + um **Site (Front-End)** + a **Nuvem (Cloud)** resolvem esse problema?"</p>
+                        <p class="mt-4 text-xs font-bold text-purple-600">Rascunhem a solução em 10 minutos.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Exemplo de Solução 4.0",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">14. Exemplo: Ônibus 4.0</h2>
+                    <div class="p-6 bg-slate-900 rounded-3xl text-slate-300 text-sm space-y-3">
+                        <p>1. **Sensor (IoT)** no ônibus envia a localização via GPS.</p>
+                        <p>2. **Nuvem** guarda os dados e calcula a hora de chegada.</p>
+                        <p>3. **Site Front-End** mostra um mapa em tempo real para o estudante.</p>
+                        <p class="font-bold text-emerald-400">Resultado: Menos tempo no sol e mais segurança.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Postura Profissional",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">15. Como apresentar sua ideia?</h2>
+                    <p class="mb-6 leading-relaxed">Não é só o que você fala, é como você se porta. </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl text-center">
+                            <h4 class="font-bold text-xs text-red-500 mb-1">EVITE</h4>
+                            <p class="text-[10px]">Falar olhando para o chão ou ler o slide.</p>
+                        </div>
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl text-center">
+                            <h4 class="font-bold text-xs text-emerald-500 mb-1">FAÇA</h4>
+                            <p class="text-[10px]">Olhe nos olhos, fale com entusiasmo e ouça críticas.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Resiliência Digital",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">16. Resiliência: O Bug vai acontecer</h2>
+                    <p class="mb-4">No desenvolvimento, coisas dão errado. A internet cai, o servidor trava, o código não compila na hora da apresentação.</p>
+                    <div class="p-6 bg-purple-900 text-white rounded-3xl">
+                        <p class="text-center italic">"O profissional 4.0 não é aquele que nunca erra, mas aquele que mantém a calma e resolve o erro."</p>
+                    </div>
+                `
+            },
+            {
+                title: "Trabalho em Equipe no SENAI",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">17. O Poder do Grupo</h2>
+                    <p class="mb-4 leading-relaxed">Aproveite seus colegas de curso. No futuro, um deles pode ser seu sócio ou quem vai te indicar para uma vaga.</p>
+                    <div class="mt-4 p-4 bg-slate-100 rounded-xl border-dashed border-2 border-slate-300 text-center text-sm font-bold text-slate-500 uppercase">
+                        Network é o seu pilar invisível.
+                    </div>
+                `
+            },
+            {
+                title: "Autonomia e Aprendizado",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">18. Seja Autodidata</h2>
+                    <p class="mb-4 leading-relaxed">A Indústria 4.0 muda todo dia. O que você aprendeu hoje pode estar velho em 2 anos. </p>
+                    <p class="text-sm font-bold text-purple-600">A maior habilidade é APRENDER A APRENDER.</p>
+                </div>
+                `
+            },
+            {
+                title: "Ética: O Lado Sombrio",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">19. Ética: O que não fazer</h2>
+                    <p class="mb-4">Não use a tecnologia para enganar. Não crie sites "fake" e não venda os dados dos seus usuários.</p>
+                    <p class="text-xs text-slate-500 italic">Uma reputação manchada no mundo digital é quase impossível de limpar.</p>
+                `
+            },
+            {
+                title: "Dica: Primeiro Passo",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">20. 💡 Dica: Comece Pequeno</h2>
+                    <div class="p-8 bg-amber-50 rounded-[2.5rem] border-2 border-amber-200">
+                        <h4 class="font-bold text-amber-900 mb-2">Dica de Carreira</h4>
+                        <p class="text-sm text-amber-800 leading-relaxed">Não tente criar o próximo Facebook amanhã. Crie um site que resolve um problema da sua rua. Isso vai te dar portfólio e confiança.</p>
+                        <p class="mt-4 text-xs font-bold text-amber-600">Empresas amam quem "põe a mão na massa".</p>
+                    </div>
+                `
+            },
+            {
+                title: "Adaptação à Mudança",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">21. Mudando de Fase</h2>
+                    <p class="mb-4">A tecnologia é como um jogo que recebe atualizações mensais. Você precisa se adaptar às novas mecânicas rapidamente.</p>
+                    <div class="p-4 bg-white border border-slate-200 rounded-2xl text-center shadow-sm font-bold text-purple-600 uppercase text-xs">
+                        Adaptabilidade = Sobrevivência
+                    </div>
+                `
+            },
+            {
+                title: "Diversidade e Tecnologia",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">22. Diversidade no Time</h2>
+                    <p class="mb-4">Times com pessoas diferentes criam sites melhores. Se todo mundo pensa igual, ninguém vê o erro que está na frente do nariz.</p>
+                `
+            },
+            {
+                title: "O Futuro: 5G em Macapá",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">23. 5G e as Oportunidades</h2>
+                    <p class="mb-4 leading-relaxed">Com a chegada do 5G, a internet vai ser rápida o suficiente para controlarmos robôs pesados via site sem nenhum atraso.</p>
+                    <p class="text-sm font-bold text-cyan-600 uppercase">Prepare-se para essa velocidade!</p>
+                `
+            },
+            {
+                title: "Comunicação Não-Violenta",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">24. Resolvendo Conflitos</h2>
+                    <p class="mb-4 leading-relaxed">Em grupos de desenvolvimento, ideias vão bater de frente. Use a **Comunicação Não-Violenta**: foque no problema do código, não na pessoa que o escreveu.</p>
+                `
+            },
+            {
+                title: "Mentalidade Inovadora",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-slate-900">25. Mentalidade 'Always Beta'</h2>
+                    <p class="mb-4 leading-relaxed">Seu site nunca está pronto. Ele está sempre em evolução. Aceite que ele pode melhorar sempre.</p>
+                `
+            },
+            {
+                title: "Sustentabilidade Digital",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">26. Código Limpo e Sustentável</h2>
+                    <p class="mb-4 leading-relaxed">Código bagunçado faz o servidor gastar mais energia. Código limpo é código ecológico. Pense nisso!</p>
+                `
+            },
+            {
+                title: "Mito vs Verdade: Soft Skills",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">27. Mito vs Verdade</h2>
+                    <div class="p-6 bg-white rounded-3xl border border-slate-200">
+                        <p class="font-bold mb-2">"Desenvolvedor não precisa saber falar em público?"</p>
+                        <p class="text-sm text-slate-600"><b>Mito.</b> Se você não souber explicar por que sua solução é boa, ninguém vai usá-la.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Quiz Final do Material",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">28. Quiz Final - Parte I</h2>
+                    <p class="mb-4 font-medium">Qual o foco principal da Sociedade 5.0?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-purple-50 transition">A) Aumentar a velocidade das máquinas.</button>
+                        <button onclick="alert('Correto! O bem-estar humano é o objetivo.')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-emerald-50 transition">B) Usar a tecnologia para o bem-estar e resolução de problemas humanos.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Quiz Final do Material",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">29. Quiz Final - Parte II</h2>
+                    <p class="mb-4 font-medium">O que é um 'Pitch'?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Correto! Curto, direto e convincente.')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-emerald-50 transition">A) Uma apresentação curta e impactante de uma ideia.</button>
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-200 rounded-xl hover:bg-red-50 transition">B) Um tipo de linguagem de programação para robôs.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Formatura Digital",
+                content: `
+                    <div class="text-center py-10">
+                        <div class="w-24 h-24 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce shadow-2xl">
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path></svg>
+                        </div>
+                        <h2 class="text-4xl font-extrabold text-slate-900 mb-4">Você Concluiu a Jornada!</h2>
+                        <p class="text-slate-500 mb-8 max-w-sm mx-auto text-lg">As 12 horas de Fundamentos da Indústria 4.0 terminaram, mas sua carreira de inovador está apenas começando.</p>
+                    </div>
+                `
+            }
+        ];
+
+        let currentPage = 0;
+
+        function renderPage() {
+            const container = document.getElementById('contentTarget');
+            const page = pages[currentPage];
+            
+            container.innerHTML = `
+                <div class="page-content active">
+                    <p class="text-xs font-black text-purple-400 uppercase tracking-[0.2em] mb-3">${page.title}</p>
+                    ${page.content}
+                </div>
+            `;
+
+            const progress = ((currentPage + 1) / pages.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('pageIndicator').innerText = `${String(currentPage + 1).padStart(2, '0')}/${pages.length}`;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 0;
+            document.getElementById('nextBtn').innerText = currentPage === pages.length - 1 ? "Finalizar o Material" : "Próxima Página";
+            
+            window.scrollTo(0, 0);
+            updateDots();
+        }
+
+        function changePage(step) {
+            const next = currentPage + step;
+            if (next >= 0 && next < pages.length) {
+                currentPage = next;
+                renderPage();
+            } else if (next === pages.length) {
+                alert("Parabéns, Desenvolvedor! Você completou toda a trilha. Sucesso em sua carreira no Amapá e no mundo!");
+            }
+        }
+
+        function updateDots() {
+            const dotNav = document.getElementById('dotNav');
+            dotNav.innerHTML = '';
+            const start = Math.max(0, currentPage - 3);
+            const end = Math.min(pages.length, start + 7);
+
+            for (let i = 0; i < pages.length; i++) {
+                if (i >= start && i < end) {
+                    const dot = document.createElement('div');
+                    dot.className = `w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentPage ? 'bg-purple-600 w-6' : 'bg-slate-300'}`;
+                    dotNav.appendChild(dot);
+                }
+            }
+        }
+
+        renderPage();
+    </script>
+</body>
+</html>
