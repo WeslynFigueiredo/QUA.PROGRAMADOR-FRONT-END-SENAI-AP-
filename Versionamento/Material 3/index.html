@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Versionamento | Material 03</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-bar { transition: width 0.4s ease; }
+        .bg-git-module-3 { background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 antialiased">
+
+    <!-- Header Fixo -->
+    <header class="fixed top-0 left-0 w-full bg-slate-900/90 backdrop-blur-md border-b border-slate-800 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-git-module-3 rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-white leading-none">Versionamento</h1>
+                    <p class="text-[10px] text-indigo-400 font-bold uppercase tracking-widest mt-1">Material 3: Ramificações e Erros</p>
+                </div>
+            </div>
+            <div class="flex-1 max-w-xs mx-8 hidden sm:block">
+                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div id="progressBar" class="progress-bar h-full bg-indigo-500 w-0"></div>
+                </div>
+            </div>
+            <div id="pageIndicator" class="text-sm font-black text-indigo-500 bg-indigo-500/10 px-3 py-1 rounded-full">01/30</div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="mt-24 mb-32 max-w-4xl mx-auto px-6">
+        <div id="contentTarget"></div>
+    </main>
+
+    <!-- Navegação Inferior -->
+    <footer class="fixed bottom-0 left-0 w-full bg-slate-900 border-t border-slate-800 p-4 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <button id="prevBtn" onclick="changePage(-1)" class="flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-slate-500 hover:text-indigo-40 transition disabled:opacity-0">
+                Anterior
+            </button>
+            <div id="dotNav" class="hidden sm:flex gap-1.5"></div>
+            <button id="nextBtn" onclick="changePage(1)" class="px-8 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 shadow-xl transition-all active:scale-95">
+                Próxima
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        const pages = [
+            {
+                title: "Início do Material 3",
+                content: `
+                    <div class="text-center py-12">
+                        <span class="bg-indigo-500/20 text-indigo-400 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Encontro Presencial</span>
+                        <h2 class="text-5xl font-extrabold text-white mt-6 mb-4 leading-tight">Ramificações e Erros</h2>
+                        <p class="text-xl text-slate-400 max-w-xl mx-auto">Prepare-se para entender como trabalhar em múltiplas funcionalidades ao mesmo tempo sem criar um caos no seu projeto principal.</p>
+                        <div class="mt-12 p-8 bg-git-module-3 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden text-left">
+                            <h4 class="font-bold text-indigo-200 uppercase text-[10px] mb-4 tracking-tighter">Missões de Hoje:</h4>
+                            <ul class="space-y-4 text-sm font-medium">
+                                <li class="flex gap-3"><span class="bg-white/20 p-1 rounded">🌿</span> <b>Branches:</b> Criando realidades paralelas.</li>
+                                <li class="flex gap-3"><span class="bg-white/20 p-1 rounded">🔀</span> <b>Merges:</b> Unindo códigos de forma inteligente.</li>
+                                <li class="flex gap-3"><span class="bg-white/20 p-1 rounded">🆘</span> <b>Socorro:</b> Desfazendo erros e restaurando versões.</li>
+                                <li class="flex gap-3"><span class="bg-white/20 p-1 rounded">⚔️</span> <b>Conflitos:</b> O laboratório presencial de resolução.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "O que é uma Branch?",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">01. O Conceito de Branch 🌿</h2>
+                    <p class="mb-6 leading-relaxed text-slate-400">Uma **Branch** (ramificação) é como um galho de árvore que nasce do tronco principal. No Git, o tronco principal geralmente se chama <code class="text-indigo-400 font-bold">main</code>.</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700">
+                        <h4 class="font-bold text-white mb-4">Por que usar?</h4>
+                        <p class="text-sm text-slate-400">Imagine que o site da empresa está no ar. Você precisa criar uma página de "Promoção", mas não quer correr o risco de quebrar o site atual enquanto testa o código novo. Você cria uma branch para isso!</p>
+                    </div>
+                `
+            },
+            {
+                title: "Analogia: Multiverso",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">02. Analogia: Multiverso 🌌</h2>
+                    <p class="mb-6 text-slate-400">Trabalhar com branches é como as linhas do tempo dos filmes de super-heróis.</p>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-white/5 border-l-4 border-indigo-500 rounded-r-xl">
+                            <h4 class="font-bold text-white">Linha do Tempo Sagrada (main)</h4>
+                            <p class="text-xs text-slate-400">O código que está funcionando e o cliente está vendo.</p>
+                        </div>
+                        <div class="p-4 bg-white/5 border-l-4 border-purple-500 rounded-r-xl">
+                            <h4 class="font-bold text-white">Variante (Branch 'nova-feature')</h4>
+                            <p class="text-xs text-slate-400">Você criou um novo universo para testar um botão azul. Se der errado, você apaga esse universo e a linha sagrada continua intacta.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Comando: git branch",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">03. Criando seu Primeiro Galho</h2>
+                    <p class="mb-4 text-slate-400">Para ver em qual branch você está ou criar uma nova:</p>
+                    <div class="grid gap-4">
+                        <div class="p-4 bg-slate-800 rounded-xl">
+                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-1 tracking-widest">Listar Branches</p>
+                            <code class="text-indigo-400 text-sm">git branch</code>
+                        </div>
+                        <div class="p-4 bg-slate-800 rounded-xl">
+                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-1 tracking-widest">Criar Nova Branch</p>
+                            <code class="text-indigo-400 text-sm">git branch nome-da-branch</code>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Viajando entre Branches",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">04. Saltando no Tempo</h2>
+                    <p class="mb-4 text-slate-400">Criar o galho não te coloca nele automaticamente. Você precisa "pular" para ele.</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700 font-mono text-sm space-y-4">
+                        <p class="text-indigo-400">git checkout nome-da-branch</p>
+                        <p class="text-slate-500 text-[10px] italic">// Ou o comando moderno:</p>
+                        <p class="text-indigo-400">git switch nome-da-branch</p>
+                    </div>
+                    <div class="mt-6 p-4 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
+                        <p class="text-xs font-bold text-indigo-400 uppercase mb-1">Dica de Atalho:</p>
+                        <code class="text-xs text-white">git checkout -b nova-feature</code>
+                        <p class="text-[10px] text-slate-500 mt-1">Este comando cria e já pula para a branch nova em um só passo!</p>
+                    </div>
+                `
+            },
+            {
+                title: "O Fluxo de Feature Branch",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">05. O Jeito Profissional</h2>
+                    <p class="mb-6 leading-relaxed text-slate-400">Em metodologias ágeis, nunca trabalhamos direto na <code class="text-indigo-400">main</code>. Seguimos este fluxo:</p>
+                    <ol class="flex flex-col gap-3">
+                        <li class="p-3 bg-white/5 rounded-lg border border-slate-700 text-xs">1. Estou na <b>main</b> e recebo um pedido.</li>
+                        <li class="p-3 bg-white/5 rounded-lg border border-slate-700 text-xs">2. Crio a branch <b>ajuste-de-cor</b> e pulo para ela.</li>
+                        <li class="p-3 bg-white/5 rounded-lg border border-slate-700 text-xs">3. Faço meus commits lá.</li>
+                        <li class="p-3 bg-white/5 rounded-lg border border-slate-700 text-xs">4. Quando estiver pronto, volto para a <b>main</b> e uno os códigos.</li>
+                    </ol>
+                `
+            },
+            {
+                title: "Ação: Criando a Branch",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">06. ⚡ AÇÃO: Criando o Galho de Contato</h2>
+                    <p class="mb-4 text-slate-400">No seu terminal presencial, execute:</p>
+                    <div class="p-6 bg-black rounded-2xl border border-slate-700 font-mono text-xs text-indigo-400 leading-relaxed">
+                        git checkout -b pagina-contato <br>
+                        touch contato.html <br>
+                        git add . <br>
+                        git commit -m "Cria estrutura da página de contato"
+                    </div>
+                    <p class="mt-4 text-xs text-slate-500 italic text-center">Agora você tem um arquivo que só existe nesse universo paralelo!</p>
+                `
+            },
+            {
+                title: "Unindo Mundos: O Merge",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">07. O Merge (Fusão) 🔀</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Sua página de contato está pronta. Como levar ela de volta para o tronco principal?</p>
+                    <div class="p-6 bg-indigo-600 rounded-3xl shadow-xl">
+                        <h4 class="font-bold text-white mb-4">A Sequência da Vitória:</h4>
+                        <ol class="text-sm space-y-3 font-mono">
+                            <li>1. git checkout main (Volta pro tronco)</li>
+                            <li>2. git merge pagina-contato (Puxa o galho)</li>
+                        </ol>
+                    </div>
+                    <p class="mt-6 text-sm text-slate-500 italic">O Git vai pegar todos os commits da branch e aplicar na main automaticamente.</p>
+                `
+            },
+            {
+                title: "Tipos de Merge",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">08. Fast-Forward vs Three-Way</h2>
+                    <div class="grid sm:grid-cols-2 gap-4 text-[10px]">
+                        <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                            <h4 class="font-bold text-indigo-400 mb-2">Fast-Forward</h4>
+                            <p class="text-slate-400">A main não mudou enquanto você estava fora. O Git apenas "corre" a main até o seu último commit.</p>
+                        </div>
+                        <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                            <h4 class="font-bold text-purple-400 mb-2">Three-Way (Merge Commit)</h4>
+                            <p class="text-slate-400">Alguém mudou a main enquanto você trabalhava. O Git cria um novo "commit de fusão" para unir os dois caminhos.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Tags: Marcos da Versão",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">09. Tags: Batendo o Carimbo 🏷️</h2>
+                    <p class="mb-4 text-slate-400">As tags são nomes fáceis para commits importantes (como o lançamento de um site).</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700">
+                        <code class="text-sm text-indigo-400">git tag -a v1.0 -m "Versão de Lançamento"</code>
+                        <p class="mt-4 text-xs text-slate-500 italic">É como colocar uma etiqueta "NÃO MEXER" ou "PRONTO PARA O CLIENTE" num ponto específico do tempo.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Semver: Regra de Nomes",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">10. Versionamento Semântico</h2>
+                    <p class="mb-4 text-slate-400 leading-relaxed">Não damos nomes aleatórios para as versões. Usamos o padrão <b>MAJOR.MINOR.PATCH</b> (Ex: 1.2.0):</p>
+                    <ul class="text-xs space-y-3">
+                        <li class="flex gap-2 text-indigo-400"><span class="font-bold">MAJOR:</span> Mudança gigante que quebra coisas antigas.</li>
+                        <li class="flex gap-2 text-purple-400"><span class="font-bold">MINOR:</span> Nova funcionalidade que não quebra nada.</li>
+                        <li class="flex gap-2 text-slate-400"><span class="font-bold">PATCH:</span> Só um conserto de bug bobo.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Socorro: Desfazendo Erros",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">11. O Botão de Pânico 🆘</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Como Engenheiro de DevOps, eu sei: todo mundo erra. O Git tem três formas de te salvar:</p>
+                    <div class="grid gap-4">
+                        <div class="p-4 bg-slate-800 rounded-xl border-l-4 border-amber-500">
+                            <h4 class="font-bold text-white">Restore</h4>
+                            <p class="text-[10px] text-slate-400 italic">"Mudei o arquivo e não salvei no Git ainda, quero desfazer."</p>
+                        </div>
+                        <div class="p-4 bg-slate-800 rounded-xl border-l-4 border-red-500">
+                            <h4 class="font-bold text-white">Reset</h4>
+                            <p class="text-[10px] text-slate-400 italic">"Commitei algo errado e quero apagar esse commit do histórico."</p>
+                        </div>
+                        <div class="p-4 bg-slate-800 rounded-xl border-l-4 border-blue-500">
+                            <h4 class="font-bold text-white">Revert</h4>
+                            <p class="text-[10px] text-slate-400 italic">"Commitei errado, mas quero criar um novo commit que desfaz o anterior (mais seguro!)."</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Prática: O Reset Violento",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">12. Cuidado com o --hard</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">O comando mais perigoso (e útil) é o reset forçado. Ele apaga TUDO e volta o tempo.</p>
+                    <div class="p-6 bg-red-900/20 border-2 border-red-500/30 rounded-3xl">
+                        <code class="text-sm text-red-400">git reset --hard id_do_commit</code>
+                        <p class="mt-4 text-[10px] text-slate-500 uppercase font-bold tracking-widest">Aviso: Use apenas em caso de emergência total!</p>
+                    </div>
+                `
+            },
+            {
+                title: "Dica do Mestre: Macapá/Santana Presencial",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">13. 💡 Dica do Mestre: Trabalho Local</h2>
+                    <div class="p-8 bg-indigo-500/10 rounded-[2.5rem] border-2 border-indigo-500/20">
+                        <h4 class="font-bold text-indigo-400 mb-2">Colaboração no Campus</h4>
+                        <p class="text-sm text-slate-300 leading-relaxed italic">"Estamos aqui presencialmente hoje por um motivo: entender conflitos. No dia a dia de uma agência aqui em Macapá, você vai estar no ar-condicionado codando com um colega do lado. Se os dois mexerem na mesma linha do index.html, o Git vai travar. É agora que você mostra que é um dev de elite!"</p>
+                    </div>
+                `
+            },
+            {
+                title: "O que é um Conflito?",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">14. O Conflito de Código ⚔️</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">O Git é esperto, mas não lê mentes. Se você mudar a cor do botão para **Azul** e seu colega mudar para **Verde** na mesma linha, o Git para tudo e pergunta: "Qual eu escolho?".</p>
+                    <div class="p-6 bg-amber-600 rounded-3xl text-white text-center font-bold">
+                        "CONFLICT (content): Merge conflict in index.html"
+                    </div>
+                `
+            },
+            {
+                title: "Lendo o Conflito",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">15. Decifrando a "Linguagem Alienígena"</h2>
+                    <p class="mb-4 text-slate-400">Quando há um conflito, o Git suja o seu arquivo com marcas especiais:</p>
+                    <div class="p-6 bg-black rounded-2xl border border-slate-700 font-mono text-xs">
+                        <span class="text-indigo-400"><<<<<<< HEAD</span><br>
+                        &nbsp;&nbsp;background: blue;<br>
+                        <span class="text-slate-500">=======</span><br>
+                        &nbsp;&nbsp;background: green;<br>
+                        <span class="text-purple-400">>>>>>>> feature-verde</span>
+                    </div>
+                    <p class="mt-4 text-xs text-slate-500 italic">O que está entre <<< e === é o seu código. O que está entre === e >>> é o código do colega.</p>
+                `
+            },
+            {
+                title: "Resolvendo Conflitos",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">16. Como Resolver?</h2>
+                    <p class="mb-4 text-slate-400">Você tem três opções:</p>
+                    <ul class="text-sm space-y-4">
+                        <li class="p-3 bg-white/5 rounded-lg border-l-4 border-indigo-500"><b>Accept Current Change:</b> Fica com o seu código.</li>
+                        <li class="p-3 bg-white/5 rounded-lg border-l-4 border-purple-500"><b>Accept Incoming Change:</b> Fica com o código do colega.</li>
+                        <li class="p-3 bg-white/5 rounded-lg border-l-4 border-emerald-500"><b>Accept Both:</b> Tenta unir os dois (perigoso!).</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Ação: O Merge Amigável",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">17. ⚡ AÇÃO: Finalizando o Conflito</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400 text-sm">Depois de apagar as marcas (<<<<, ====, >>>>) e escolher o código certo, você **PRECISA** avisar o Git que acabou:</p>
+                    <div class="bg-slate-900 p-6 rounded-2xl font-mono text-xs text-indigo-400 space-y-2">
+                        git add index.html <br>
+                        git commit -m "Resolve conflito de cores"
+                    </div>
+                `
+            },
+            {
+                title: "Laboratório Presencial I",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">18. Laboratório Presencial (Parte 1)</h2>
+                    <p class="mb-4 text-slate-400">Formem duplas. </p>
+                    <div class="p-6 bg-indigo-50 border-2 border-indigo-200 rounded-3xl text-indigo-900">
+                        <h4 class="font-bold mb-2">O Desafio:</h4>
+                        <p class="text-sm">Aluno A cria a branch <b>layout</b>. Aluno B cria a branch <b>cores</b>. Os dois mudam o título do site no mesmo arquivo <b>index.html</b>. Tentem fazer o merge e vejam o erro acontecer na tela!</p>
+                    </div>
+                `
+            },
+            {
+                title: "Laboratório Presencial II",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">19. Laboratório Presencial (Parte 2)</h2>
+                    <p class="mb-4 text-slate-400">Agora que o erro aconteceu:</p>
+                    <div class="p-6 bg-white rounded-3xl border border-slate-200 text-slate-800">
+                        <p class="text-sm font-bold mb-4">Usem o VS Code para resolver o conflito:</p>
+                        <ul class="text-xs space-y-2 list-disc ml-4">
+                            <li>Identifiquem as cores do VS Code (azul e verde no editor).</li>
+                            <li>Decidam juntos qual título fica melhor.</li>
+                            <li>Salvem o arquivo e finalizem com o commit.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "Mito vs Verdade: Merge",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">20. Mito vs Verdade</h2>
+                    <div class="p-6 bg-white/5 rounded-3xl border border-slate-700">
+                        <p class="font-bold text-indigo-400 mb-2">"O Git vai apagar meu código se der conflito?"</p>
+                        <p class="text-sm text-slate-400 leading-relaxed italic">**Mito.** O Git para tudo e não deixa você commitar até que **VOCÊ** resolva o problema. Ele nunca deleta nada sozinho num conflito de conteúdo.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Limpando a Bagunça",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">21. Deletando Branches</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Depois que o galho já foi unido ao tronco (Merge), ele pode ser apagado para não poluir o projeto.</p>
+                    <div class="p-4 bg-slate-800 rounded-xl">
+                        <code class="text-indigo-400 text-sm">git branch -d nome-da-branch</code>
+                        <p class="text-[10px] text-slate-500 mt-2 italic">Dica: Use -D (maiúsculo) se quiser forçar a deleção de uma branch que não foi unida.</p>
+                    </div>
+                `
+            },
+            {
+                title: "O Diário de Bordo: reflog",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">22. O 'Detetive' git reflog</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Deletou algo por erro e nem o 'git log' mostra? O <code>git reflog</code> é o histórico do que aconteceu no seu computador, mesmo que você tenha dado reset.</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700">
+                        <code class="text-sm text-indigo-400">git reflog</code>
+                    </div>
+                `
+            },
+            {
+                title: "Versionamento de Imagens?",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">23. Git e Arquivos Binários</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Como Mentor, aviso: o Git é péssimo para imagens e vídeos. Ele salva cada versão inteira de novo, fazendo o projeto ficar pesado.</p>
+                    <div class="p-4 bg-amber-500/10 border-l-4 border-amber-500 rounded-r-xl">
+                        <p class="text-[10px] text-amber-500 font-bold uppercase">Dica Ágil:</p>
+                        <p class="text-xs">Evite versionar fotos de 10MB no Git. Use links externos ou ferramentas como Git LFS.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Agilidade: O Pull Request (Intro)",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">24. Pedindo Licença</h2>
+                    <p class="mb-4 text-slate-400 leading-relaxed">Na agilidade, o merge não é feito sozinho. Nós criamos um **Pull Request (PR)**. </p>
+                    <div class="p-6 bg-slate-100 rounded-3xl border border-slate-200 text-slate-800">
+                        <p class="text-sm">"Ei, time! Terminei minha branch. Alguém pode dar uma olhada e ver se está tudo certo antes de eu unir com a main?"</p>
+                    </div>
+                `
+            },
+            {
+                title: "Preparação para o Material 4",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">25. O Grande Final</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Hoje dominamos o trabalho paralelo e os erros locais. No **Material 4**, vamos subir de nível: GitHub, Remotos e Hospedagem do seu primeiro site para o mundo!</p>
+                    <div class="p-4 bg-white/5 rounded-xl border border-slate-700 text-center text-xs font-bold text-slate-500 uppercase">
+                        Sua máquina é pequena. A nuvem é o limite.
+                    </div>
+                `
+            },
+            {
+                title: "Checklist do Dev de Elite",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">26. Checklist do Material 3</h2>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-slate-700">
+                            <input type="checkbox" class="w-5 h-5 rounded text-indigo-600">
+                            <span class="text-sm">Sei criar uma branch nova?</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-slate-700">
+                            <input type="checkbox" class="w-5 h-5 rounded text-indigo-600">
+                            <span class="text-sm">Sei o que fazer quando vejo "<<<< HEAD"?</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-slate-700">
+                            <input type="checkbox" class="w-5 h-5 rounded text-indigo-600">
+                            <span class="text-sm">Entendi a diferença entre MAJOR e MINOR?</span>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Stashing: Guardando no Bolso",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">27. O Comando git stash</h2>
+                    <p class="mb-4 text-slate-400">Precisa trocar de branch urgente mas o código atual está uma bagunça e você não quer commitar?</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700 text-center">
+                        <code class="text-indigo-400 text-sm">git stash</code>
+                        <p class="text-[10px] text-slate-500 mt-2">Isso "limpa" sua área de trabalho e guarda as mudanças num bolso secreto para você pegar depois.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Quiz: Branches",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">28. Quiz Material 3 - Parte I</h2>
+                    <p class="mb-4 font-medium">Qual comando cria uma branch e já muda para ela?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Correto!')" class="w-full p-4 text-left border border-slate-700 rounded-xl hover:bg-indigo-500/20 transition">A) git checkout -b funcionalidade</button>
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-700 rounded-xl hover:bg-slate-800 transition">B) git branch funcionalidade</button>
+                    </div>
+                `
+            },
+            {
+                title: "Quiz: Conflitos",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">29. Quiz Material 3 - Parte II</h2>
+                    <p class="mb-4 font-medium">O que você deve fazer imediatamente após resolver um conflito manualmente?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Correto! O add e commit finalizam a resolução.')" class="w-full p-4 text-left border border-slate-700 rounded-xl hover:bg-indigo-500/20 transition">A) Dar git add no arquivo e commitar.</button>
+                        <button onclick="alert('Incorreto! Isso apagaria sua resolução.')" class="w-full p-4 text-left border border-slate-700 rounded-xl hover:bg-slate-800 transition">B) Dar git reset para começar de novo.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Final do Material 3",
+                content: `
+                    <div class="text-center py-10">
+                        <div class="w-24 h-24 bg-indigo-500 text-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl animate-pulse">
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h2 class="text-4xl font-extrabold text-white mb-4">Material 3 Concluído!</h2>
+                        <p class="text-slate-400 mb-8 max-w-sm mx-auto text-lg">Incrível! Você sobreviveu aos conflitos e aprendeu a dominar o tempo. Agora você é um dev que trabalha em equipe sem medo.</p>
+                        <div class="p-6 bg-slate-800 rounded-3xl border-2 border-indigo-500/50 inline-block">
+                            <p class="text-[10px] font-bold text-indigo-400 uppercase mb-1 tracking-widest">Amanhã:</p>
+                            <p class="font-bold text-white">Material 4: GitHub e o Mundo Exterior</p>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        let currentPage = 0;
+
+        function renderPage() {
+            const container = document.getElementById('contentTarget');
+            const page = pages[currentPage];
+            
+            container.innerHTML = `
+                <div class="page-content active">
+                    <p class="text-xs font-black text-indigo-400 uppercase tracking-[0.2em] mb-3">${page.title}</p>
+                    ${page.content}
+                </div>
+            `;
+
+            const progress = ((currentPage + 1) / pages.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('pageIndicator').innerText = `${String(currentPage + 1).padStart(2, '0')}/${pages.length}`;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 0;
+            document.getElementById('nextBtn').innerText = currentPage === pages.length - 1 ? "Finalizar Dia" : "Próxima Página";
+            
+            window.scrollTo(0, 0);
+            updateDots();
+        }
+
+        function changePage(step) {
+            const next = currentPage + step;
+            if (next >= 0 && next < pages.length) {
+                currentPage = next;
+                renderPage();
+            } else if (next === pages.length) {
+                alert("Material 3 Finalizado com Sucesso! Prepare o seu GitHub para amanhã.");
+            }
+        }
+
+        function updateDots() {
+            const dotNav = document.getElementById('dotNav');
+            dotNav.innerHTML = '';
+            const start = Math.max(0, currentPage - 3);
+            const end = Math.min(pages.length, start + 7);
+
+            for (let i = 0; i < pages.length; i++) {
+                if (i >= start && i < end) {
+                    const dot = document.createElement('div');
+                    dot.className = `w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentPage ? 'bg-indigo-600 w-6' : 'bg-slate-700'}`;
+                    dotNav.appendChild(dot);
+                }
+            }
+        }
+
+        renderPage();
+    </script>
+</body>
+</html>
