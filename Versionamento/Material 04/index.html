@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Versionamento | Material 04</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-bar { transition: width 0.4s ease; }
+        .bg-git-module-4 { background: linear-gradient(135deg, #6d28d9 0%, #1e40af 100%); }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 antialiased">
+
+    <!-- Header Fixo -->
+    <header class="fixed top-0 left-0 w-full bg-slate-900/90 backdrop-blur-md border-b border-slate-800 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-git-module-4 rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-white leading-none">Versionamento Hero</h1>
+                    <p class="text-[10px] text-purple-400 font-bold uppercase tracking-widest mt-1">Material 4: Colaboração Remota</p>
+                </div>
+            </div>
+            <div class="flex-1 max-w-xs mx-8 hidden sm:block">
+                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div id="progressBar" class="progress-bar h-full bg-purple-500 w-0"></div>
+                </div>
+            </div>
+            <div id="pageIndicator" class="text-sm font-black text-purple-500 bg-purple-500/10 px-3 py-1 rounded-full">01/30</div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="mt-24 mb-32 max-w-4xl mx-auto px-6">
+        <div id="contentTarget"></div>
+    </main>
+
+    <!-- Navegação Inferior -->
+    <footer class="fixed bottom-0 left-0 w-full bg-slate-900 border-t border-slate-800 p-4 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <button id="prevBtn" onclick="changePage(-1)" class="flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-slate-500 hover:text-purple-40 transition disabled:opacity-0">
+                Anterior
+            </button>
+            <div id="dotNav" class="hidden sm:flex gap-1.5"></div>
+            <button id="nextBtn" onclick="changePage(1)" class="px-8 py-3 bg-purple-600 text-white rounded-2xl font-bold hover:bg-purple-700 shadow-xl transition-all active:scale-95">
+                Próxima
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        const pages = [
+            {
+                title: "Encontro Final",
+                content: `
+                    <div class="text-center py-12">
+                        <span class="bg-purple-500/20 text-purple-400 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Presencial & Colaborativo</span>
+                        <h2 class="text-5xl font-extrabold text-white mt-6 mb-4 leading-tight">O Mundo Cloud</h2>
+                        <p class="text-xl text-slate-400 max-w-xl mx-auto">Chegou a hora de tirar seu código da "bolha" e mostrá-lo para o mundo através do GitHub.</p>
+                        <div class="mt-12 p-8 bg-git-module-4 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden text-left">
+                            <h4 class="font-bold text-purple-200 uppercase text-[10px] mb-4 tracking-tighter">Missão de Encerramento:</h4>
+                            <ul class="space-y-4 text-sm font-medium">
+                                <li class="flex gap-3"><span class="bg-white/20 p-1 rounded">☁️</span> <b>Remote:</b> Conectando seu PC à nuvem.</li>
+                                <li class="flex gap-3"><span class="bg-white/20 p-1 rounded">🛡️</span> <b>Cibersegurança:</b> Blindando repositórios colaborativos.</li>
+                                <li class="flex gap-3"><span class="bg-white/20 p-1 rounded">📑</span> <b>Docs:</b> O README que te faz ser contratado.</li>
+                                <li class="flex gap-3"><span class="bg-white/20 p-1 rounded">🏆</span> <b>Desafio Final:</b> O Projeto colaborativo em tempo real.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "O que é GitHub?",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">01. GitHub: A Nuvem do Código ☁️</h2>
+                    <p class="mb-6 leading-relaxed text-slate-400">Se o Git é o diário no seu computador, o **GitHub** (ou GitLab) é o blog onde você publica esse diário para que outros leiam e contribuam.</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700">
+                        <h4 class="font-bold text-white mb-4 text-center">Analogia: Redes Sociais</h4>
+                        <p class="text-sm text-slate-400 italic">"GitHub é o Instagram dos programadores. Em vez de fotos de açaí, você posta suas linhas de código e recebe 'likes' na forma de estrelas (stars)."</p>
+                    </div>
+                `
+            },
+            {
+                title: "Segurança: SSH vs HTTPS",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">02. Como o PC fala com a Nuvem?</h2>
+                    <p class="mb-4 text-slate-400">Você precisa de uma "ponte" segura para enviar seu código.</p>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div class="p-4 bg-white/5 border border-slate-700 rounded-xl">
+                            <h4 class="font-bold text-blue-400 mb-1">HTTPS</h4>
+                            <p class="text-[10px] text-slate-500">Usa seu login e senha do navegador. Fácil de configurar, mas pede login direto.</p>
+                        </div>
+                        <div class="p-4 bg-white/5 border border-slate-700 rounded-xl">
+                            <h4 class="font-bold text-purple-400 mb-1">SSH</h4>
+                            <p class="text-[10px] text-slate-500">Usa uma 'chave física digital'. Mais seguro e profissional. É o padrão da indústria.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Comando: git remote",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">03. Adicionando o Endereço Remoto</h2>
+                    <p class="mb-4 text-slate-400">O Git local precisa saber onde está o repositório na internet.</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700 font-mono text-sm">
+                        <p class="text-purple-400">git remote add origin <span class="text-slate-500">https://github.com/voce/projeto.git</span></p>
+                    </div>
+                    <p class="mt-6 text-xs text-slate-500 italic"><b>Origin</b> é o apelido padrão que damos para o servidor remoto.</p>
+                `
+            },
+            {
+                title: "Enviando: git push",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">04. O Lançamento: git push 🚀</h2>
+                    <p class="mb-4 text-slate-400">Hora de enviar seus commits para o mundo!</p>
+                    <div class="p-6 bg-purple-600 rounded-3xl shadow-xl">
+                        <code class="text-white text-sm font-bold">git push -u origin main</code>
+                    </div>
+                    <p class="mt-4 text-xs text-slate-400 leading-relaxed">O <b>-u</b> diz ao Git: "A partir de agora, sempre que eu der push, mande para este lugar e para esta branch".</p>
+                `
+            },
+            {
+                title: "Baixando: git clone",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">05. Clonando Projetos</h2>
+                    <p class="mb-4 text-slate-400 leading-relaxed">Viu um projeto legal no GitHub de um colega do SENAI? Traga ele para sua máquina!</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700">
+                        <code class="text-sm text-purple-400">git clone url-do-projeto</code>
+                        <p class="mt-4 text-[10px] text-slate-500 uppercase font-bold tracking-widest">Tradução: "Cria uma pasta, dá 'git init' e baixa tudo o que está lá na nuvem".</p>
+                    </div>
+                `
+            },
+            {
+                title: "Atualizando: git pull",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">06. Sincronização: git pull 📥</h2>
+                    <p class="mb-4 text-slate-400 leading-relaxed">Seu colega enviou mudanças para o servidor. Como você as pega? </p>
+                    <div class="p-6 bg-emerald-600 rounded-3xl shadow-xl">
+                        <code class="text-white text-sm font-bold">git pull origin main</code>
+                    </div>
+                    <p class="mt-4 text-xs text-slate-400 italic">O pull é uma mistura de "baixar" (fetch) e "unir" (merge). Se houver conflito, o Git avisará agora!</p>
+                `
+            },
+            {
+                title: "Cultura Ágil: Pull Request",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">07. O Pull Request (PR) 🤝</h2>
+                    <p class="mb-6 leading-relaxed text-slate-400 text-sm">Nas empresas, você não dá push direto na <b>main</b>. Você cria uma branch, envia para o GitHub e abre um <b>PR</b>.</p>
+                    <div class="p-6 bg-white/5 border-2 border-dashed border-slate-700 rounded-3xl text-center">
+                        <p class="text-sm font-bold text-purple-400 uppercase">"Ei, time! Posso unir meu código?"</p>
+                        <p class="text-xs text-slate-500 mt-2">O PR é uma conversa sobre o código antes dele virar oficial.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Code Review: Olhar Crítico",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">08. Code Review</h2>
+                    <p class="mb-4 text-slate-400 leading-relaxed">Em DevOps, acreditamos que dois pares de olhos são melhores que um. </p>
+                    <div class="p-6 bg-slate-100 rounded-3xl border border-slate-200 text-slate-800">
+                        <h4 class="font-bold mb-2">Visão Sistêmica:</h4>
+                        <p class="text-sm italic">"Revisar o código do colega não é achar erro, é garantir a qualidade do produto final. Se o site quebrar no celular do cliente em Macapá, a culpa é de todo o time."</p>
+                    </div>
+                `
+            },
+            {
+                title: "Documentação de Elite",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">09. O README.md Profissional</h2>
+                    <p class="mb-4 text-slate-400 leading-relaxed">Seu repositório é seu cartão de visitas. Um bom README deve ter:</p>
+                    <ul class="text-sm space-y-3">
+                        <li class="p-3 bg-slate-800 rounded-xl border border-slate-700"><b>Título e Descrição:</b> O que o site faz?</li>
+                        <li class="p-3 bg-slate-800 rounded-xl border border-slate-700"><b>Tecnologias:</b> HTML, CSS, Git?</li>
+                        <li class="p-3 bg-slate-800 rounded-xl border border-slate-700"><b>Como rodar:</b> Qual o passo a passo?</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Commits Semânticos Reais",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">10. Padronização Sistemática</h2>
+                    <p class="mb-4 text-slate-400">Mensagens de commit profissionais (Conventional Commits):</p>
+                    <div class="space-y-2">
+                        <div class="p-2 bg-black rounded border border-slate-700 text-xs text-emerald-400">feat: adiciona formulario de contato</div>
+                        <div class="p-2 bg-black rounded border border-slate-700 text-xs text-red-400">fix: corrige cor do botao de erro</div>
+                        <div class="p-2 bg-black rounded border border-slate-700 text-xs text-blue-400">docs: atualiza instrucoes de instalacao</div>
+                    </div>
+                `
+            },
+            {
+                title: "Ação: O Primeiro Push",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">11. ⚡ AÇÃO: Subindo para a Nuvem</h2>
+                    <p class="mb-4 text-slate-400 text-sm">No seu terminal, vamos conectar seu repo local a um novo repo no GitHub:</p>
+                    <div class="p-6 bg-black rounded-2xl border border-slate-700 font-mono text-xs text-purple-400 leading-relaxed">
+                        git remote add origin https://github.com/SEU-USER/SEU-REPO.git <br>
+                        git branch -M main <br>
+                        git push -u origin main
+                    </div>
+                    <p class="mt-4 text-xs text-slate-500 italic text-center">Verifique sua conta no GitHub. O código já deve estar lá!</p>
+                `
+            },
+            {
+                title: "Dica do Mestre: Macapá Portfolio",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">12. 💡 Dica do Mestre: Empregabilidade</h2>
+                    <div class="p-8 bg-purple-500/10 rounded-[2.5rem] border-2 border-purple-500/20">
+                        <h4 class="font-bold text-purple-400 mb-2">Seu GitHub é seu Currículo</h4>
+                        <p class="text-sm text-slate-300 leading-relaxed italic">"Aqui em Macapá, quando uma empresa de tecnologia abre vaga, a primeira coisa que olhamos é o seu GitHub. Repositórios ativos, com README organizado e commits frequentes, valem mais que 10 cursos em PDF. Mostre que você sabe trabalhar em equipe!"</p>
+                    </div>
+                `
+            },
+            {
+                title: "Segurança: Protegendo Segredos",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">13. Cibersegurança: API Keys 🛡️</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Nunca, jamais, em hipótese alguma, suba senhas ou chaves de API para o GitHub público.</p>
+                    <div class="p-6 bg-red-900/20 border-2 border-red-500/30 rounded-3xl">
+                        <h4 class="font-bold text-red-400 mb-2">Visão Crítica:</h4>
+                        <p class="text-sm">Bots varrem o GitHub procurando arquivos <b>.env</b> com senhas de banco de dados. Se você subir um, em 5 minutos seu servidor pode ser invadido.</p>
+                    </div>
+                `
+            },
+            {
+                title: "GitHub Pages: Hospedagem",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">14. O Mundo Verá seu Site</h2>
+                    <p class="mb-4 text-slate-400">Você sabia que o GitHub hospeda seu site de graça? </p>
+                    <p class="text-sm">Basta ir em <b>Settings > Pages</b> e escolher a branch main. Em minutos, seu site terá um link real para você mandar para a família e amigos!</p>
+                `
+            },
+            {
+                title: "O Desafio Final: Visão Sistêmica",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">15. Desafio Final (Intro) 🏆</h2>
+                    <p class="mb-6 leading-relaxed text-slate-400">Vamos simular um projeto real de TI. Você e um colega serão uma equipe de desenvolvimento Front-End.</p>
+                    <div class="bg-indigo-600 p-8 rounded-[2.5rem] shadow-2xl">
+                        <h4 class="text-white font-extrabold text-xl mb-4">O Projeto: Landing Page de Segurança</h4>
+                        <p class="text-sm text-indigo-100">Uma página sobre Dicas de Cibersegurança para usuários do Amapá.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Regras do Desafio Final",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">16. Fluxo de Trabalho (GitHub Flow)</h2>
+                    <p class="mb-4 text-slate-400 text-sm">Sigam estas regras estritas para garantir a qualidade:</p>
+                    <ul class="space-y-4 text-xs font-bold text-slate-500">
+                        <li class="flex gap-2"><span>1.</span> NINGUÉM mexe na branch main.</li>
+                        <li class="flex gap-2"><span>2.</span> Cada funcionalidade (header, footer, conteúdo) deve ser uma branch nova.</li>
+                        <li class="flex gap-2"><span>3.</span> O merge na main só acontece via Pull Request com aprovação do colega.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Sistematização: Issues",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">17. Organização com Issues</h2>
+                    <p class="mb-4 text-slate-400">Antes de codar, criem **Issues** no GitHub. </p>
+                    <p class="text-sm italic">Issues são os "post-its" digitais que dizem o que precisa ser feito. Elas dão visibilidade ao progresso do time.</p>
+                `
+            },
+            {
+                title: "Ação: Trabalho em Equipe",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">18. ⚡ AÇÃO: O Grande Merge</h2>
+                    <p class="mb-4 text-slate-400">Em tempo real, unam os códigos. Se houver conflito remoto, resolvam juntos usando o que aprenderam no Material 3.</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700 text-center font-bold text-emerald-400">
+                        "Colaboração é a chave da produtividade."
+                    </div>
+                `
+            },
+            {
+                title: "Análise Crítica do Código",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">19. Debate: Evolução</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Olhem para o histórico de commits do seu projeto agora. </p>
+                    <p class="text-sm font-bold text-purple-400">Pergunta para o grupo:</p>
+                    <p class="text-sm italic italic">"Se tivéssemos feito tudo sem Git, em quanto tempo teríamos perdido arquivos ou sobrescrito o código um do outro?"</p>
+                `
+            },
+            {
+                title: "Produtividade e Versionamento",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">20. O Impacto no Resultado</h2>
+                    <p class="mb-6 leading-relaxed text-slate-400">O versionamento não é um atraso, é uma **aceleração**. Ele permite que você erre rápido, conserte rápido e nunca perca o controle da situação.</p>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="p-4 bg-white/5 rounded-xl">
+                            <p class="text-xs font-bold text-emerald-400">PRODUTIVIDADE</p>
+                            <p class="text-[10px] text-slate-500">Mais tempo codando, menos tempo procurando arquivos.</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl">
+                            <p class="text-xs font-bold text-emerald-400">QUALIDADE</p>
+                            <p class="text-[10px] text-slate-500">Código revisado e histórico rastreável.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Versionamento e Sustentabilidade",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">21. Código Sustentável</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Repositórios organizados permitem que o software viva por anos. Isso é sustentabilidade digital: não precisar jogar tudo fora e começar do zero a cada 6 meses.</p>
+                `
+            },
+            {
+                title: "Ética na Colaboração",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">22. Ética: O Código Alheio</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Ao clonar projetos Open Source, respeite as licenças (MIT, Apache, GPL). Dar o crédito ao autor original é o primeiro passo de um profissional ético.</p>
+                </div>
+                `
+            },
+            {
+                title: "Dica do Mestre: Futuro DevOps",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">23. 💡 Dica do Mestre: Carreira II</h2>
+                    <div class="p-8 bg-emerald-500/10 rounded-[2.5rem] border-2 border-emerald-500/20">
+                        <h4 class="font-bold text-emerald-400 mb-2">Além do Front-End</h4>
+                        <p class="text-sm text-slate-300 leading-relaxed italic">"Dominar Git e GitHub é o primeiro passo para se tornar um Engenheiro de DevOps. Essa carreira paga os melhores salários da TI e é focada justamente em automatizar processos e garantir a qualidade sistêmica que vimos hoje."</p>
+                    </div>
+                `
+            },
+            {
+                title: "Autogestão de Carreira",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">24. Plano de Estudos Continuado</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">A UC de Versionamento termina hoje, mas sua prática é diária. </p>
+                    <ul class="text-xs space-y-3 font-bold text-purple-400">
+                        <li>- Crie um repositório para cada aula do SENAI.</li>
+                        <li>- Documente o que você aprendeu no README.</li>
+                        <li>- Mantenha sua "Grama Verde" (calendário de commits no GitHub).</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Resumo Geral da UC",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">25. O Que Aprendemos em 16h?</h2>
+                    <div class="grid grid-cols-2 gap-4 text-[10px] uppercase font-black tracking-widest text-center">
+                        <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">Comandos de Terminal</div>
+                        <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">Ciclo de Vida (Stage/Repo)</div>
+                        <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">Branches e Conflitos</div>
+                        <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">Colaboração em Nuvem</div>
+                    </div>
+                `
+            },
+            {
+                title: "Checklist do Herói Remoto",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">26. Checklist Final</h2>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-slate-700">
+                            <input type="checkbox" class="w-5 h-5 rounded text-purple-600">
+                            <span class="text-sm">Sei dar Push e Pull?</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-slate-700">
+                            <input type="checkbox" class="w-5 h-5 rounded text-purple-600">
+                            <span class="text-sm">Entendo o que é um Pull Request?</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-slate-700">
+                            <input type="checkbox" class="w-5 h-5 rounded text-purple-600">
+                            <span class="text-sm">Meu README está pronto para o mercado?</span>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "O Poder do Clone Profissional",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">27. Contribuindo com Outros</h2>
+                    <p class="mb-4 text-slate-400">No futuro, você fará **Forks**. </p>
+                    <p class="text-sm italic">Forks são cópias de repositórios de terceiros para a sua conta, permitindo que você sugira melhorias para projetos gigantes como o React ou o VS Code.</p>
+                `
+            },
+            {
+                title: "Quiz: Repositórios Remotos",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">28. Quiz Final - Parte I</h2>
+                    <p class="mb-4 font-medium">O que o comando 'git push -u origin main' faz?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-700 rounded-xl hover:bg-slate-800 transition">A) Deleta o código do servidor.</button>
+                        <button onclick="alert('Correto! Ele envia e estabelece a conexão padrão.')" class="w-full p-4 text-left border border-slate-700 rounded-xl hover:bg-purple-500/20 transition">B) Envia os commits locais para a branch main no servidor remoto.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Quiz: Documentação",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">29. Quiz Final - Parte II</h2>
+                    <p class="mb-4 font-medium">Qual a extensão de arquivo usada para documentação formatada no Git?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Correto! .md significa Markdown.')" class="w-full p-4 text-left border border-slate-700 rounded-xl hover:bg-purple-500/20 transition">A) .md (Markdown)</button>
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-700 rounded-xl hover:bg-slate-800 transition">B) .doc (Word)</button>
+                    </div>
+                `
+            },
+            {
+                title: "Conclusão da UC",
+                content: `
+                    <div class="text-center py-10">
+                        <div class="w-24 h-24 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl animate-bounce">
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h2 class="text-4xl font-extrabold text-white mb-4">Você é um Versionamento Hero!</h2>
+                        <p class="text-slate-400 mb-8 max-w-sm mx-auto text-lg">Parabéns por concluir as 16 horas de treinamento. Você agora tem a base técnica para trabalhar em qualquer equipe de software do mundo.</p>
+                        <div class="p-8 bg-git-module-4 rounded-[3rem] text-white shadow-2xl inline-block">
+                            <h3 class="text-xl font-bold">Unidade Curricular Concluída</h3>
+                            <p class="text-sm opacity-80 mt-2">Fundamentos de Versionamento e Metodologias Ágeis.</p>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        let currentPage = 0;
+
+        function renderPage() {
+            const container = document.getElementById('contentTarget');
+            const page = pages[currentPage];
+            
+            container.innerHTML = `
+                <div class="page-content active">
+                    <p class="text-xs font-black text-purple-500 uppercase tracking-[0.2em] mb-3">${page.title}</p>
+                    ${page.content}
+                </div>
+            `;
+
+            const progress = ((currentPage + 1) / pages.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('pageIndicator').innerText = `${String(currentPage + 1).padStart(2, '0')}/${pages.length}`;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 0;
+            document.getElementById('nextBtn').innerText = currentPage === pages.length - 1 ? "Finalizar" : "Próxima Página";
+            
+            window.scrollTo(0, 0);
+            updateDots();
+        }
+
+        function changePage(step) {
+            const next = currentPage + step;
+            if (next >= 0 && next < pages.length) {
+                currentPage = next;
+                renderPage();
+            } else if (next === pages.length) {
+                alert("Parabéns, Versionamento Hero! Você acaba de subir de nível. Vá e conquiste o mundo do código!");
+            }
+        }
+
+        function updateDots() {
+            const dotNav = document.getElementById('dotNav');
+            dotNav.innerHTML = '';
+            const start = Math.max(0, currentPage - 3);
+            const end = Math.min(pages.length, start + 7);
+
+            for (let i = 0; i < pages.length; i++) {
+                if (i >= start && i < end) {
+                    const dot = document.createElement('div');
+                    dot.className = `w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentPage ? 'bg-purple-600 w-6' : 'bg-slate-700'}`;
+                    dotNav.appendChild(dot);
+                }
+            }
+        }
+
+        renderPage();
+    </script>
+</body>
+</html>
