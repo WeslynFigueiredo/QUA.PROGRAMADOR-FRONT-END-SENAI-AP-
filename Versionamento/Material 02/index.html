@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Versionamento | Material 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-bar { transition: width 0.4s ease; }
+        .bg-git-module-2 { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 antialiased">
+
+    <!-- Header Fixo -->
+    <header class="fixed top-0 left-0 w-full bg-slate-900/90 backdrop-blur-md border-b border-slate-800 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-git-module-2 rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-white leading-none">Versionamento</h1>
+                    <p class="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mt-1">Material 2: O Ciclo de Vida</p>
+                </div>
+            </div>
+            <div class="flex-1 max-w-xs mx-8 hidden sm:block">
+                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div id="progressBar" class="progress-bar h-full bg-emerald-500 w-0"></div>
+                </div>
+            </div>
+            <div id="pageIndicator" class="text-sm font-black text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">01/30</div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="mt-24 mb-32 max-w-4xl mx-auto px-6">
+        <div id="contentTarget"></div>
+    </main>
+
+    <!-- Navegação Inferior -->
+    <footer class="fixed bottom-0 left-0 w-full bg-slate-900 border-t border-slate-800 p-4 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <button id="prevBtn" onclick="changePage(-1)" class="flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-slate-500 hover:text-emerald-50 transition disabled:opacity-0">
+                Anterior
+            </button>
+            <div id="dotNav" class="hidden sm:flex gap-1.5"></div>
+            <button id="nextBtn" onclick="changePage(1)" class="px-8 py-3 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 shadow-xl transition-all active:scale-95">
+                Próxima
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        const pages = [
+            {
+                title: "Bem-vindo ao Material 2",
+                content: `
+                    <div class="text-center py-12">
+                        <span class="bg-emerald-500/20 text-emerald-400 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">A Jornada Continua</span>
+                        <h2 class="text-5xl font-extrabold text-white mt-6 mb-4 leading-tight">O Ciclo de Vida do Código</h2>
+                        <p class="text-xl text-slate-400 max-w-xl mx-auto">Entender o Git não é decorar comandos, é entender para onde o seu arquivo vai em cada etapa.</p>
+                        <div class="mt-12 p-8 bg-git-module-2 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden text-left">
+                            <h4 class="font-bold text-emerald-100 uppercase text-[10px] mb-4 tracking-tighter">O que vamos dominar hoje:</h4>
+                            <ul class="space-y-4 text-sm font-medium">
+                                <li class="flex gap-3"><span class="bg-white/20 p-1 rounded">🏗️</span> As 3 Áreas de Trabalho: Onde o código mora.</li>
+                                <li class="flex gap-3"><span class="bg-white/20 p-1 rounded">🔍</span> Consulta de Histórico: Como ler o passado com precisão.</li>
+                                <li class="flex gap-3"><span class="bg-white/20 p-1 rounded">🛡️</span> .gitignore: Criando sua lista negra de arquivos.</li>
+                                <li class="flex gap-3"><span class="bg-white/20 p-1 rounded">⏱️</span> Gestão Ágil: Como planejar commits que fazem sentido.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "As 3 Áreas: A Analogia",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">01. O Aeroporto do Código ✈️</h2>
+                    <p class="mb-6 leading-relaxed text-slate-400">Para o Git, seu projeto é como um aeroporto. O arquivo passa por etapas antes de "decolar" para o histórico.</p>
+                    <div class="grid gap-4">
+                        <div class="p-4 bg-slate-800 border-l-4 border-red-500 rounded-r-xl">
+                            <h4 class="font-bold text-white">1. Working Directory (O saguão)</h4>
+                            <p class="text-xs text-slate-400">É o seu editor (VS Code). Você está mexendo nos arquivos, mas nada está garantido ainda.</p>
+                        </div>
+                        <div class="p-4 bg-slate-800 border-l-4 border-amber-500 rounded-r-xl">
+                            <h4 class="font-bold text-white">2. Staging Area (O Check-in)</h4>
+                            <p class="text-xs text-slate-400">Você escolheu quais arquivos vão viajar. Eles estão na fila, esperando o portão abrir.</p>
+                        </div>
+                        <div class="p-4 bg-slate-800 border-l-4 border-emerald-500 rounded-r-xl">
+                            <h4 class="font-bold text-white">3. Local Repo (Dentro do Avião)</h4>
+                            <p class="text-xs text-slate-400">Você fez o commit. As mudanças estão seguras dentro da "caixa preta" do Git.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "O Ciclo Visual",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">02. O Fluxo Perpétuo</h2>
+                    <p class="mb-8 text-slate-400">Como Engenheiro de DevOps, eu te digo: você fará esse ciclo centenas de vezes por dia.</p>
+                    <div class="flex flex-col items-center gap-4 py-4">
+                        <div class="flex items-center gap-6">
+                            <div class="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-[10px] text-red-400">EDITE (Working)</div>
+                            <span class="text-slate-600">→</span>
+                            <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-[10px] text-amber-400">ADD (Stage)</div>
+                            <span class="text-slate-600">→</span>
+                            <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-[10px] text-emerald-400">COMMIT (Repo)</div>
+                        </div>
+                    </div>
+                    <div class="mt-8 p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 italic text-sm text-center">
+                        "Se não está no Repo, o trabalho ainda não foi concluído."
+                    </div>
+                `
+            },
+            {
+                title: "Ação: O Ciclo na Prática",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">03. ⚡ AÇÃO: Simulando o Fluxo</h2>
+                    <p class="mb-4 text-slate-400">Imagine que você está criando o CSS do seu site.</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700 font-mono text-sm space-y-4">
+                        <div>
+                            <p class="text-xs text-slate-500">// Passo 1: Edição</p>
+                            <p class="text-emerald-400">echo "body { color: blue; }" > style.css</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500">// Passo 2: Check-in</p>
+                            <p class="text-emerald-400">git add style.css</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500">// Passo 3: Decolagem</p>
+                            <p class="text-emerald-400">git commit -m "Estiliza o corpo do site"</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "O Status Detalhado",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">04. Decifrando o git status</h2>
+                    <p class="mb-4 text-slate-400 leading-relaxed">O <code>git status</code> é o seu melhor amigo. Ele usa cores para te ajudar:</p>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-black rounded-xl border border-slate-700">
+                            <p class="text-xs text-red-500 font-mono">Changes not staged for commit:</p>
+                            <p class="text-xs text-red-500 font-mono ml-4 underline">index.html</p>
+                            <p class="text-[10px] text-slate-500 mt-2">Significa: "Você mudou, mas ainda não deu 'git add'."</p>
+                        </div>
+                        <div class="p-4 bg-black rounded-xl border border-slate-700">
+                            <p class="text-xs text-emerald-500 font-mono">Changes to be committed:</p>
+                            <p class="text-xs text-emerald-500 font-mono ml-4 underline">index.html</p>
+                            <p class="text-[10px] text-slate-500 mt-2">Significa: "Já está no Stage. Pode dar 'git commit'."</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Consultando o Passado",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">05. Histórico: Além do 'git log'</h2>
+                    <p class="mb-4 text-slate-400">Às vezes o log fica gigante. Use filtros para ser mais produtivo:</p>
+                    <div class="grid gap-4">
+                        <div class="p-4 bg-slate-800 rounded-xl">
+                            <code class="text-emerald-400 text-sm">git log --oneline</code>
+                            <p class="text-[10px] text-slate-500 mt-1">Mostra o histórico resumido em uma linha por commit.</p>
+                        </div>
+                        <div class="p-4 bg-slate-800 rounded-xl">
+                            <code class="text-emerald-400 text-sm">git log -p</code>
+                            <p class="text-[10px] text-slate-500 mt-1">Mostra exatamente o que mudou dentro de cada arquivo.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Segurança: .gitignore",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">06. O Arquivo Invisível (.gitignore)</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Como Engenheiro de DevOps, meu maior medo é você subir senhas do banco de dados para o repositório público.</p>
+                    <div class="p-6 bg-red-500/10 border-2 border-red-500/30 rounded-3xl">
+                        <h4 class="font-bold text-red-400 mb-2 uppercase text-xs tracking-widest">A Regra do Silêncio</h4>
+                        <p class="text-sm">Arquivos que contenham senhas, pastas de dependências gigantes (node_modules) ou arquivos temporários do sistema devem ser **ignorados**.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Como criar um .gitignore",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">07. ⚡ AÇÃO: Blindando o Repo</h2>
+                    <p class="mb-4 text-sm text-slate-400">Crie o arquivo no terminal:</p>
+                    <div class="bg-black p-4 rounded-xl mb-6">
+                        <code class="text-emerald-400 text-sm">touch .gitignore</code>
+                    </div>
+                    <p class="text-xs mb-2 text-slate-500 uppercase font-bold">O que escrever dentro dele?</p>
+                    <div class="p-4 bg-slate-800 rounded-xl font-mono text-xs text-slate-400">
+                        # Ignorar dependências do Front-End <br>
+                        node_modules/ <br><br>
+                        # Ignorar arquivos de segredo <br>
+                        .env <br><br>
+                        # Ignorar arquivos do Windows <br>
+                        Thumbs.db
+                    </div>
+                `
+            },
+            {
+                title: "Dica do Mestre: Macapá Security",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">08. 💡 Dica do Mestre: Proteção</h2>
+                    <div class="p-8 bg-emerald-500/10 rounded-[2.5rem] border-2 border-emerald-500/20">
+                        <h4 class="font-bold text-emerald-400 mb-2 text-lg">Segurança em Primeiro Lugar</h4>
+                        <p class="text-sm text-slate-300 leading-relaxed italic">"Aqui em Macapá, estamos vendo um crescimento de startups de logística. Se você deixar vazar uma chave de API de rastreamento no seu Git por falta de um .gitignore, o prejuízo pode ser de milhares de reais. Automatize sua segurança ignorando o desnecessário!"</p>
+                    </div>
+                `
+            },
+            {
+                title: "Agilidade: Commits Pequenos",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">09. Commits Pequenos e Frequentes</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Nas metodologias ágeis (Scrum/Kanban), a visibilidade é tudo. </p>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div class="p-4 bg-red-500/10 rounded-xl border border-red-500/20">
+                            <h5 class="text-red-400 font-bold text-xs mb-2">ERRO COMUM</h5>
+                            <p class="text-[10px]">Trabalhar 4 horas e fazer um único commit: "Site pronto".</p>
+                        </div>
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <h5 class="text-emerald-400 font-bold text-xs mb-2">JEITO ÁGIL</h5>
+                            <p class="text-[10px]">Commit 1: "Cria Header"<br>Commit 2: "Ajusta cores"<br>Commit 3: "Adiciona links".</p>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-[10px] text-slate-500 italic">Isso facilita muito na hora de dar o "rollback" (voltar atrás) se algo der errado.</p>
+                `
+            },
+            {
+                title: "Workshop: Gestão do Tempo",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">10. ⚡ DESAFIO: Planejando a Sprint</h2>
+                    <p class="mb-4 text-slate-400">Você tem 4 horas para entregar uma página de login.</p>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-white/5 rounded-lg border border-slate-700 text-xs flex justify-between">
+                            <span>0h - 1h: Criar estrutura HTML</span>
+                            <span class="text-emerald-400 font-bold">COMMIT AQUI!</span>
+                        </div>
+                        <div class="p-3 bg-white/5 rounded-lg border border-slate-700 text-xs flex justify-between">
+                            <span>1h - 3h: Estilizar com CSS</span>
+                            <span class="text-emerald-400 font-bold">COMMIT AQUI!</span>
+                        </div>
+                        <div class="p-3 bg-white/5 rounded-lg border border-slate-700 text-xs flex justify-between">
+                            <span>3h - 4h: Validar campos</span>
+                            <span class="text-emerald-400 font-bold">COMMIT AQUI!</span>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Consultando Linha a Linha",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">11. Quem quebrou o site? (git blame)</h2>
+                    <p class="mb-4 text-slate-400">O comando <code>git blame</code> mostra quem escreveu cada linha de um arquivo.</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700">
+                        <code class="text-sm text-emerald-400">git blame index.html</code>
+                        <p class="mt-4 text-xs text-slate-500 italic leading-relaxed">Não serve para culpar os outros, mas para saber quem você deve chamar para tirar uma dúvida sobre aquele trecho específico!</p>
+                    </div>
+                `
+            },
+            {
+                title: "Limpando o Stage",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">12. Errei o 'git add'. E agora?</h2>
+                    <p class="mb-4 text-slate-400">Se você adicionou um arquivo que não devia ao Stage, pode tirá-lo sem deletar o arquivo real.</p>
+                    <div class="p-6 bg-black rounded-2xl border border-slate-700">
+                        <code class="text-sm text-amber-500">git reset index.html</code>
+                        <p class="mt-4 text-[10px] text-slate-500 uppercase font-bold tracking-widest">Tradução: "Sai da fila do check-in, mas continua no saguão!"</p>
+                    </div>
+                `
+            },
+            {
+                title: "Analogia: A Máquina do Tempo",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">13. Voltando no Tempo (git checkout)</h2>
+                    <p class="mb-4 text-slate-400 leading-relaxed">O <code>git checkout</code> te permite viajar para versões antigas de um arquivo. </p>
+                    <div class="p-6 bg-indigo-600 rounded-3xl shadow-xl">
+                        <code class="text-white text-sm font-bold">git checkout HEAD index.html</code>
+                        <p class="mt-2 text-xs opacity-80">Restaura o arquivo para a versão do último commit. Todas as mudanças não salvas no Stage serão apagadas.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Mito vs Verdade: .gitignore",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">14. Mito vs Verdade</h2>
+                    <div class="p-6 bg-white/5 rounded-3xl border border-slate-700">
+                        <p class="font-bold text-emerald-400 mb-2">"Se eu apagar uma linha do .gitignore, o Git volta a rastrear o arquivo?"</p>
+                        <p class="text-sm text-slate-400 leading-relaxed italic">**Sim.** Mas cuidado: se o arquivo já foi enviado para o repositório antes de ser ignorado, ele continuará lá. Você terá que removê-lo manualmente do cache do Git.</p>
+                    </div>
+                `
+            },
+            {
+                title: "A Diferença entre git restore",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">15. Comandos Modernos</h2>
+                    <p class="mb-4 text-slate-400">Nas versões novas do Git, usamos comandos mais intuitivos:</p>
+                    <ul class="space-y-4">
+                        <li class="p-4 bg-slate-800 rounded-xl">
+                            <code class="text-emerald-400">git restore --staged <arquivo></code>
+                            <p class="text-[10px] text-slate-500">Tira do Stage (igual ao reset antigo).</p>
+                        </li>
+                        <li class="p-4 bg-slate-800 rounded-xl">
+                            <code class="text-emerald-400">git restore <arquivo></code>
+                            <p class="text-[10px] text-slate-500">Descarta mudanças no Working Directory (igual ao checkout antigo).</p>
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                title: "Configurando o Editor",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">16. VS Code + Git</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">A maioria de nós usa o VS Code. Ele tem uma aba chamada "Source Control" que faz tudo isso visualmente.</p>
+                    <div class="p-6 bg-slate-100 rounded-3xl border border-slate-200 text-slate-800">
+                        <h4 class="font-bold mb-2">Por que usar o terminal então?</h4>
+                        <p class="text-sm">Porque quando você for um Engenheiro de DevOps, você terá que rodar scripts automáticos que o VS Code não faz. **Aprenda o terminal, domine o mundo.**</p>
+                    </div>
+                `
+            },
+            {
+                title: "Análise de Cenário Ágil",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">17. Cenário: O Erro de Sexta-feira</h2>
+                    <p class="mb-4 text-slate-400">Você editou 5 arquivos, mas percebeu que um deles está com bug.</p>
+                    <div class="p-6 bg-white/5 border-2 border-dashed border-slate-700 rounded-3xl">
+                        <p class="text-sm font-bold text-amber-500">O que o Dev Ágil faz?</p>
+                        <p class="text-xs mt-2 italic">Dá 'git add' apenas nos 4 que estão bons, commita com uma mensagem clara, e usa 'git restore' no que está ruim para recomeçar do zero.</p>
+                    </div>
+                `
+            },
+            {
+                title: "O que é o HEAD?",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">18. Entendendo o HEAD</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Você verá muito essa palavra. O **HEAD** é simplesmente um ponteiro que diz: "Você está aqui agora".</p>
+                    <div class="p-6 bg-slate-800 text-center rounded-2xl border border-slate-700">
+                        <div class="text-2xl mb-2">📍</div>
+                        <h4 class="font-bold text-emerald-400">HEAD</h4>
+                        <p class="text-[10px] text-slate-500 uppercase">Último commit do branch atual.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Workshop: Criando o .gitignore",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">19. ⚡ MISSÃO: Segurança Front-End</h2>
+                    <p class="mb-4 text-slate-400 text-sm">Pratique agora no seu computador:</p>
+                    <div class="p-6 bg-slate-900 border border-slate-700 rounded-2xl space-y-3 font-mono text-xs text-emerald-400">
+                        mkdir projeto-seguro <br>
+                        cd projeto-seguro <br>
+                        git init <br>
+                        touch .env <br>
+                        echo ".env" >> .gitignore <br>
+                        git status
+                    </div>
+                    <p class="mt-4 text-[10px] text-slate-500">Confirme se o arquivo .env aparece na lista ou se o Git o ignorou com sucesso!</p>
+                `
+            },
+            {
+                title: "Commits Semânticos",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">20. Mensagens Nível Sênior</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Use prefixos nas suas mensagens (Conventional Commits):</p>
+                    <ul class="text-sm space-y-2">
+                        <li><b>feat:</b> Nova funcionalidade (ex: feat: add login form)</li>
+                        <li><b>fix:</b> Correção de bug (ex: fix: login button color)</li>
+                        <li><b>docs:</b> Mudanças na documentação</li>
+                        <li><b>style:</b> Mudanças visuais que não afetam o código</li>
+                    </ul>
+                `
+            },
+            {
+                title: "A Diferença de git show",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">21. O Comando git show</h2>
+                    <p class="mb-4 text-slate-400">Quer ver os detalhes de um commit específico?</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700">
+                        <code class="text-sm text-emerald-400">git show <id_do_commit></code>
+                        <p class="mt-4 text-xs text-slate-500 italic">Isso mostra quem, quando e o quê mudou naquele exato momento.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Dica do Mestre: Macapá Jobs",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">22. 💡 Dica do Mestre: Organização</h2>
+                    <div class="p-8 bg-emerald-500/10 rounded-[2.5rem] border-2 border-emerald-500/20 text-center">
+                        <h4 class="font-bold text-emerald-400 mb-2">Organize seu Futuro</h4>
+                        <p class="text-sm text-slate-300 leading-relaxed italic">"Aqui em nossa região, as equipes são enxutas. Se você for o desenvolvedor que entrega o código já organizado, com mensagens de commit fáceis de ler, você economiza o tempo do seu gestor. Quem economiza tempo dos outros é promovido mais rápido!"</p>
+                    </div>
+                `
+            },
+            {
+                title: "Removendo Arquivos",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">23. Deletando do Git</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Se você quer deletar um arquivo e já avisar ao Git:</p>
+                    <div class="p-6 bg-red-900/10 border border-red-500/20 rounded-2xl">
+                        <code class="text-red-400 text-sm">git rm arquivo.html</code>
+                        <p class="mt-4 text-[10px] text-slate-500">Isso remove o arquivo do seu computador e já o coloca no Stage para o próximo commit de remoção.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Renomeando Arquivos",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">24. Mudando o Nome</h2>
+                    <p class="mb-4 text-slate-400 leading-relaxed">Não use o botão direito do mouse para renomear arquivos em um repo Git. Use:</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700 text-center">
+                        <code class="text-emerald-400 text-sm">git mv antigo.html novo.html</code>
+                        <p class="text-[10px] text-slate-500 mt-2">Isso mantém o histórico de mudanças do arquivo original!</p>
+                    </div>
+                `
+            },
+            {
+                title: "Preparação para o Material 3",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6 text-white">25. O que vem por aí?</h2>
+                    <p class="mb-4 leading-relaxed text-slate-400">Dominamos o ciclo local. Agora, no Material 3, vamos aprender a trabalhar com **Múltiplas Realidades** (Branches) e como unir códigos de pessoas diferentes.</p>
+                    <div class="p-4 bg-white/5 rounded-xl border border-slate-700 text-center text-xs font-bold text-slate-500 uppercase">
+                        O Git local é seu diário. O Git em equipe é sua rede social.
+                    </div>
+                `
+            },
+            {
+                title: "Consultando Arquivos Específicos",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">26. Log de um Único Arquivo</h2>
+                    <p class="mb-4 text-slate-400">"Quero ver só o que mudou no meu CSS."</p>
+                    <div class="p-6 bg-slate-800 rounded-3xl border border-slate-700">
+                        <code class="text-sm text-emerald-400">git log style.css</code>
+                        <p class="mt-4 text-xs text-slate-500 italic">Simples assim. O Git filtra todo o resto e te mostra só a história desse arquivo.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Agilidade: O Conceito de Done",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">27. Definição de 'Pronto'</h2>
+                    <p class="mb-4 text-slate-400">Na agilidade, uma tarefa só está "Done" (Pronta) se:</p>
+                    <ul class="text-xs space-y-3 font-bold text-emerald-400">
+                        <li>1. O código funciona no navegador.</li>
+                        <li>2. O código foi adicionado ao Git (Add).</li>
+                        <li>3. O commit foi feito com uma mensagem clara.</li>
+                        <li>4. Os arquivos desnecessários foram ignorados.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Quiz: Ciclo de Vida",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">28. Quiz Material 2 - Parte I</h2>
+                    <p class="mb-4 font-medium">Qual a função principal da 'Staging Area'?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-700 rounded-xl hover:bg-slate-800 transition">A) Deletar arquivos permanentemente.</button>
+                        <button onclick="alert('Correto! É a sala de espera antes do commit.')" class="w-full p-4 text-left border border-slate-700 rounded-xl hover:bg-emerald-500/20 transition">B) Selecionar e preparar quais mudanças serão salvas no próximo commit.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Quiz: .gitignore",
+                content: `
+                    <h2 class="text-3xl font-bold mb-6">29. Quiz Material 2 - Parte II</h2>
+                    <p class="mb-4 font-medium">O que acontece se eu adicionar 'node_modules/' no .gitignore?</p>
+                    <div class="space-y-2">
+                        <button onclick="alert('Correto! O Git deixará de vigiar essa pasta.')" class="w-full p-4 text-left border border-slate-700 rounded-xl hover:bg-emerald-500/20 transition">A) O Git vai parar de rastrear as mudanças nessa pasta.</button>
+                        <button onclick="alert('Incorreto!')" class="w-full p-4 text-left border border-slate-700 rounded-xl hover:bg-slate-800 transition">B) A pasta será deletada do seu computador.</button>
+                    </div>
+                `
+            },
+            {
+                title: "Final do Material 2",
+                content: `
+                    <div class="text-center py-10">
+                        <div class="w-24 h-24 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl animate-pulse">
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <h2 class="text-4xl font-extrabold text-white mb-4">Material 2 Concluído!</h2>
+                        <p class="text-slate-400 mb-8 max-w-sm mx-auto text-lg">Você agora domina o ciclo vital do código. Você não apenas salva arquivos, você gerencia a evolução do seu software.</p>
+                        <div class="p-6 bg-slate-800 rounded-3xl border-2 border-emerald-500/50 inline-block">
+                            <p class="text-[10px] font-bold text-emerald-400 uppercase mb-1 tracking-widest">Próxima Parada:</p>
+                            <p class="font-bold text-white">Material 3: Branches, Merges e Conflitos</p>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        let currentPage = 0;
+
+        function renderPage() {
+            const container = document.getElementById('contentTarget');
+            const page = pages[currentPage];
+            
+            container.innerHTML = `
+                <div class="page-content active">
+                    <p class="text-xs font-black text-emerald-400 uppercase tracking-[0.2em] mb-3">${page.title}</p>
+                    ${page.content}
+                </div>
+            `;
+
+            const progress = ((currentPage + 1) / pages.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('pageIndicator').innerText = `${String(currentPage + 1).padStart(2, '0')}/${pages.length}`;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 0;
+            document.getElementById('nextBtn').innerText = currentPage === pages.length - 1 ? "Finalizar" : "Próxima Página";
+            
+            window.scrollTo(0, 0);
+            updateDots();
+        }
+
+        function changePage(step) {
+            const next = currentPage + step;
+            if (next >= 0 && next < pages.length) {
+                currentPage = next;
+                renderPage();
+            } else if (next === pages.length) {
+                alert("Material 2 Finalizado! Seu ciclo de vida como dev acaba de evoluir.");
+            }
+        }
+
+        function updateDots() {
+            const dotNav = document.getElementById('dotNav');
+            dotNav.innerHTML = '';
+            const start = Math.max(0, currentPage - 3);
+            const end = Math.min(pages.length, start + 7);
+
+            for (let i = 0; i < pages.length; i++) {
+                if (i >= start && i < end) {
+                    const dot = document.createElement('div');
+                    dot.className = `w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentPage ? 'bg-emerald-600 w-6' : 'bg-slate-700'}`;
+                    dotNav.appendChild(dot);
+                }
+            }
+        }
+
+        renderPage();
+    </script>
+</body>
+</html>
