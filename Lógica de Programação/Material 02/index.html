@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lógica de Programação | Anatomia do Código - Variáveis e Operadores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+        :root {
+            --primary: #3b82f6;
+            --bg-dark: #0f172a;
+            --code-bg: #1e293b;
+        }
+
+        body { font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
+        .dark-mode { background-color: var(--bg-dark); color: #f1f5f9; }
+        
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .pulo-gato { border-left: 4px solid #f59e0b; background: #fffbeb; padding: 1.25rem; border-radius: 0.5rem; color: #92400e; }
+        .dark-mode .pulo-gato { background: #451a03; color: #fde68a; }
+
+        .battlefield { border-left: 4px solid #ef4444; background: #fef2f2; padding: 1.25rem; border-radius: 0.5rem; color: #991b1b; }
+        .dark-mode .battlefield { background: #450a0a; color: #fecaca; }
+
+        .code-block { font-family: 'Fira Code', monospace; background: var(--code-bg); color: #94a3b8; padding: 1rem; border-radius: 0.5rem; position: relative; overflow-x: auto; }
+        .code-highlight { color: #38bdf8; font-weight: bold; }
+        .code-val { color: #fbbf24; }
+        .code-type { color: #c084fc; }
+        .code-comment { color: #64748b; font-style: italic; }
+
+        .progress-fill { transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .memory-box { border: 2px dashed #475569; width: 120px; height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; position: relative; }
+        .memory-box::before { content: 'Slot Memória'; position: absolute; top: -20px; font-size: 10px; color: #64748b; }
+
+        @keyframes pulse-xp { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .xp-anim { animation: pulse-xp 0.5s ease-in-out; }
+
+        details summary { cursor: pointer; transition: 0.2s; }
+        details summary:hover { opacity: 0.8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col hidden lg:flex">
+            <div class="p-6 border-b border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white"><i class="fas fa-code"></i></div>
+                    <div>
+                        <h1 class="font-bold">Lógica de Programação</h1>
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Material 02</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto p-4 space-y-1 custom-scrollbar" id="toc-list"></nav>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+                <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-xl flex items-center gap-3">
+                    <div id="xp-indicator" class="w-12 h-12 rounded-full border-4 border-blue-500 flex items-center justify-center font-bold text-xs text-blue-600">0%</div>
+                    <div>
+                        <p class="text-[10px] font-bold uppercase text-slate-500">Nível do Aluno</p>
+                        <p id="user-rank" class="text-sm font-bold">Iniciante</p>
+                        <p id="xp-text" class="text-[10px] font-mono">0 / 500 XP</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="flex-1 flex flex-col bg-white dark:bg-slate-950">
+            
+            <header class="h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-10">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-slate-500"><i class="fas fa-bars"></i></button>
+                    <span class="text-sm font-bold text-slate-400">Anatomia do Código</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full text-xs font-bold">
+                        <button onclick="adjustFont(-1)" class="hover:text-blue-500">A-</button>
+                        <button onclick="adjustFont(1)" class="hover:text-blue-500">A+</button>
+                    </div>
+                    <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"><i class="fas fa-moon"></i></button>
+                </div>
+            </header>
+
+            <div class="w-full h-1 bg-slate-100 dark:bg-slate-800">
+                <div id="progress-bar" class="h-full bg-blue-600 progress-fill" style="width: 0%"></div>
+            </div>
+
+            <div id="content-viewport" class="flex-1 overflow-y-auto p-6 md:p-12 lg:p-20 text-[16px]">
+                <div id="slide-container" class="max-w-4xl mx-auto space-y-8">
+                    <!-- Conteúdo via JS -->
+                </div>
+            </div>
+
+            <footer class="h-20 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 bg-white dark:bg-slate-900">
+                <button onclick="prev()" class="px-6 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition"><i class="fas fa-chevron-left mr-2"></i> Anterior</button>
+                <div class="text-sm font-bold text-slate-400 font-mono" id="page-nav">01 / 30</div>
+                <button onclick="next()" class="px-8 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg transition">Próximo <i class="fas fa-chevron-right ml-2"></i></button>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        const material = [
+            {
+                title: "Início do Laboratório",
+                icon: "fa-vial",
+                content: `
+                    <h2 class="text-4xl font-extrabold mb-4">Bem-vindo ao Lab de Código!</h2>
+                    <p class="text-lg">Hoje é o dia em que você para de observar e começa a entender a <b>anatomia</b> do software. Vamos falar sobre como o computador guarda informações e como ele faz cálculos para nós.</p>
+                    <div class="pulo-gato mt-6">
+                        <strong>Dica:</strong> Pense no computador como um assistente que tem uma memória infinita, mas que precisa que você diga exatamente em qual "caixa" ele deve guardar cada coisa.
+                    </div>
+                `
+            },
+            {
+                title: "O conceito de Variável",
+                icon: "fa-box",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">O que é uma Variável?</h2>
+                    <p>Uma variável é um <b>espaço na memória</b> do computador reservado para guardar um valor que pode mudar durante a execução do programa.</p>
+                    <div class="flex justify-around items-center py-10">
+                        <div class="memory-box">
+                            <span class="text-[10px] text-blue-500 font-bold uppercase">Nome: Idade</span>
+                            <span class="text-xl font-bold">25</span>
+                        </div>
+                        <i class="fas fa-arrow-right opacity-30"></i>
+                        <div class="memory-box border-blue-500 bg-blue-50 dark:bg-blue-900/20">
+                            <span class="text-[10px] text-blue-500 font-bold uppercase">Nome: Idade</span>
+                            <span class="text-xl font-bold text-blue-600">26</span>
+                        </div>
+                    </div>
+                    <p class="text-sm italic text-center">O nome da caixa (Idade) permanece, mas o conteúdo mudou!</p>
+                `
+            },
+            {
+                title: "Declarando Variáveis",
+                icon: "fa-edit",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Declarar: Criando a Caixa</h2>
+                    <p>Para criar uma variável, usamos palavras-chave. No JavaScript moderno, as principais são <b>let</b> e <b>const</b>.</p>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">let</span> nomeDoAluno = <span class="code-val">"João"</span>;<br>
+                        <span class="code-highlight">const</span> dataNascimento = <span class="code-val">"30/03/1995"</span>;
+                    </div>
+                    <ul class="list-disc pl-6 space-y-2 mt-4 text-sm">
+                        <li><b>let:</b> Para valores que podem mudar (ex: saldo da conta).</li>
+                        <li><b>const:</b> Para valores constantes que nunca mudam (ex: CPF).</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Tipos de Dados: Texto",
+                icon: "fa-quote-left",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Tipo: String (Texto)</h2>
+                    <p>Sempre que guardamos palavras, frases ou letras, usamos o tipo <b>String</b>. Elas devem estar entre aspas.</p>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">let</span> profissao = <span class="code-val">"Programador Front-End"</span>;
+                    </div>
+                    <div class="pulo-gato mt-4">
+                        <strong>Analogia:</strong> Uma String é como uma "corda" de caracteres presos um ao outro. Se você colocar um número entre aspas, o PC o tratará como texto!
+                    </div>
+                `
+            },
+            {
+                title: "Tipos de Dados: Números",
+                icon: "fa-calculator",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Tipo: Number (Números)</h2>
+                    <p>Números não usas aspas. Podem ser inteiros ou decimais (usamos ponto no lugar da vírgula).</p>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">let</span> peso = <span class="code-val">82.5</span>; <span class="text-slate-500">// Decimal (float)</span><br>
+                        <span class="code-highlight">let</span> idade = <span class="code-val">18</span>; <span class="text-slate-500">// Inteiro (int)</span>
+                    </div>
+                `
+            },
+            {
+                title: "Tipos de Dados: Booleano",
+                icon: "fa-toggle-on",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Tipo: Boolean (Sim ou Não)</h2>
+                    <p>O tipo Booleano só aceita dois valores: <b>true</b> (verdadeiro) ou <b>false</b> (falso).</p>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">let</span> estaLogado = <span class="code-val">true</span>;<br>
+                        <span class="code-highlight">let</span> possuiDesconto = <span class="code-val">false</span>;
+                    </div>
+                    <p class="mt-4">É como um interruptor de luz: ou está ligado, ou desligado.</p>
+                `
+            },
+            {
+                title: "Operadores Aritméticos I",
+                icon: "fa-plus",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Operações Básicas</h2>
+                    <p>O computador é uma calculadora super potente. Usamos os operadores padrão:</p>
+                    <div class="grid grid-cols-2 gap-4 mt-6">
+                        <div class="p-4 bg-white dark:bg-slate-800 rounded-lg shadow-sm"><b>+</b> Adição</div>
+                        <div class="p-4 bg-white dark:bg-slate-800 rounded-lg shadow-sm"><b>-</b> Subtração</div>
+                        <div class="p-4 bg-white dark:bg-slate-800 rounded-lg shadow-sm"><b>*</b> Multiplicação</div>
+                        <div class="p-4 bg-white dark:bg-slate-800 rounded-lg shadow-sm"><b>/</b> Divisão</div>
+                    </div>
+                `
+            },
+            {
+                title: "Operadores Aritméticos II",
+                icon: "fa-percentage",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Resto e Potência</h2>
+                    <p>Além do básico, temos dois operadores muito importantes para lógica:</p>
+                    <ul class="space-y-4 mt-6">
+                        <li><b>% (Módulo):</b> Pega o <u>resto</u> da divisão. Útil para saber se um número é par ou ímpar.</li>
+                        <li><b>** (Exponenciação):</b> Eleva um número a uma potência.</li>
+                    </ul>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">let</span> resto = <span class="code-val">10 % 3</span>; <span class="text-slate-500">// Resultado: 1</span><br>
+                        <span class="code-highlight">let</span> aoQuadrado = <span class="code-val">5 ** 2</span>; <span class="text-slate-500">// Resultado: 25</span>
+                    </div>
+                `
+            },
+            {
+                title: "Precedência Matemática",
+                icon: "fa-list-ol",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Quem vem primeiro?</h2>
+                    <p>Assim como na escola, o computador segue uma ordem. Multiplicação e Divisão acontecem ANTES de Soma e Subtração.</p>
+                    <div class="battlefield mt-6">
+                        <strong>Cenário de Crise:</strong><br>
+                        <code>let resultado = 2 + 2 * 10;</code><br>
+                        O resultado será <b>22</b> e não 40. Se quiser 40, use parênteses: <code>(2 + 2) * 10;</code>
+                    </div>
+                `
+            },
+            {
+                title: "Simulador: Calculadora de IMC",
+                icon: "fa-weight",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">PBL: Criando a Lógica do IMC</h2>
+                    <p>O Índice de Massa Corporal (IMC) é calculado pela fórmula: <b>Peso / (Altura * Altura)</b>.</p>
+                    <div class="glass p-6 rounded-2xl mt-6 space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase opacity-50">Seu Peso (kg)</label>
+                                <input type="number" id="imc-peso" step="0.1" class="w-full p-2 rounded bg-white dark:bg-slate-800 border" placeholder="ex: 80">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase opacity-50">Sua Altura (m)</label>
+                                <input type="number" id="imc-altura" step="0.01" class="w-full p-2 rounded bg-white dark:bg-slate-800 border" placeholder="ex: 1.75">
+                            </div>
+                        </div>
+                        <button onclick="calcularIMC()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition shadow-lg">Calcular via Algoritmo</button>
+                        <div id="imc-result" class="text-center p-4 rounded-xl font-bold text-2xl hidden"></div>
+                        
+                        <details class="mt-4 bg-slate-100 dark:bg-slate-800 p-4 rounded-lg">
+                            <summary class="font-bold text-sm text-blue-500">Ver Solução do Código (JS)</summary>
+                            <div class="code-block mt-2 text-xs">
+<span class="code-comment">// 1. Pegamos os valores dos campos</span><br>
+<span class="code-highlight">let</span> peso = <span class="code-val">80</span>;<br>
+<span class="code-highlight">let</span> altura = <span class="code-val">1.75</span>;<br><br>
+<span class="code-comment">// 2. Aplicamos a fórmula matemática</span><br>
+<span class="code-highlight">let</span> imc = peso / (altura * altura);<br><br>
+<span class="code-comment">// 3. Mostramos o resultado formatado</span><br>
+console.log(<span class="code-val">"O seu IMC é: "</span> + imc.toFixed(<span class="code-val">2</span>));
+                            </div>
+                        </details>
+                    </div>
+                `
+            },
+            {
+                title: "Boas Práticas: Nomes",
+                icon: "fa-tag",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Como dar nome às variáveis?</h2>
+                    <p>No Front-End, usamos o padrão <b>camelCase</b>. A primeira palavra é minúscula e as seguintes começam com Maiúscula.</p>
+                    <div class="grid grid-cols-2 gap-4 mt-6">
+                        <div class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 rounded-lg">
+                            <h4 class="font-bold text-green-600">Certo ✅</h4>
+                            <p class="text-xs font-mono">let nomeDoUsuario;<br>let saldoFinal;</p>
+                        </div>
+                        <div class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded-lg">
+                            <h4 class="font-bold text-red-600">Errado ❌</h4>
+                            <p class="text-xs font-mono">let n;<br>let NOME_DO_USUARIO;</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Comentários no Código",
+                icon: "fa-comments",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Deixando Recados</h2>
+                    <p>Comentários são textos que o computador ignora. Eles servem para explicar o que seu código faz para outros humanos (ou para você no futuro).</p>
+                    <div class="code-block mt-4">
+                        <span class="code-comment">// Comentário de uma linha</span><br>
+                        <span class="code-highlight">let</span> x = <span class="code-val">10</span>;<br><br>
+                        <span class="code-comment">/* Comentário de várias<br>
+                        linhas para explicações<br>
+                        mais longas */</span>
+                    </div>
+                `
+            },
+            {
+                title: "Concatenação de Strings",
+                icon: "fa-link",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Somando Textos?</h2>
+                    <p>Quando usamos o sinal de <b>+</b> entre textos, o computador os "gruda". Chamamos isso de <b>Concatenação</b>.</p>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">let</span> saudacao = <span class="code-val">"Olá, "</span>;<br>
+                        <span class="code-highlight">let</span> nome = <span class="code-val">"Maria"</span>;<br>
+                        console.log(saudacao + nome); <span class="code-comment">// Resultado: "Olá, Maria"</span>
+                    </div>
+                `
+            },
+            {
+                title: "Template Literals",
+                icon: "fa-magic",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Template Literals: O jeito moderno</h2>
+                    <p>Em vez de usar o sinal de +, podemos usar <b>crases (\`)</b> e o símbolo <b>\${}</b> para misturar texto e variáveis.</p>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">let</span> idade = <span class="code-val">15</span>;<br>
+                        console.log(<span class="code-val">\`Eu tenho \${idade} anos\`</span>);
+                    </div>
+                    <p class="mt-4 text-sm">Isso deixa o código muito mais limpo e fácil de ler!</p>
+                `
+            },
+            {
+                title: "Case Sensitivity",
+                icon: "fa-font",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Maiúsculas Importam!</h2>
+                    <p>Na programação, letras maiúsculas e minúsculas são tratadas como coisas diferentes. Isso se chama <b>Case Sensitivity</b>.</p>
+                    <div class="battlefield mt-6">
+                        <strong>Cuidado!</strong><br>
+                        <code>let idade = 10;</code><br>
+                        <code>let Idade = 20;</code><br>
+                        Para o computador, estas são duas caixas de memória totalmente diferentes.
+                    </div>
+                `
+            },
+            {
+                title: "Operadores de Atribuição",
+                icon: "fa-hand-holding",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Atribuição Rápida</h2>
+                    <p>Às vezes queremos somar um valor a uma variável que já existe. Podemos usar atalhos.</p>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">let</span> pontos = <span class="code-val">10</span>;<br>
+                        pontos += <span class="code-val">5</span>; <span class="code-comment">// É o mesmo que: pontos = pontos + 5</span><br>
+                        console.log(pontos); <span class="code-comment">// Resultado: 15</span>
+                    </div>
+                `
+            },
+            {
+                title: "Incremento e Decremento",
+                icon: "fa-plus-circle",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Somando 1 de cada vez</h2>
+                    <p>Muito comum em jogos e contadores, o <b>++</b> e o <b>--</b> aumentam ou diminuem o valor em exatamente 1.</p>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">let</span> vidas = <span class="code-val">3</span>;<br>
+                        vidas--; <span class="code-comment">// Perdeu uma vida. Restam 2.</span><br>
+                        vidas++; <span class="code-comment">// Ganhou um bônus. Volta para 3.</span>
+                    </div>
+                `
+            },
+            {
+                title: "Tipagem Dinâmica",
+                icon: "fa-random",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Tipagem Dinâmica</h2>
+                    <p>No JavaScript, uma caixa (variável) pode mudar o tipo de coisa que guarda. Começa com um número e depois pode guardar um texto.</p>
+                    <div class="pulo-gato mt-6">
+                        <strong>Aviso:</strong> Embora seja possível fazer isso, é uma má prática. Tente manter uma variável sempre com o mesmo tipo de dado para não confundir o seu código!
+                    </div>
+                `
+            },
+            {
+                title: "Conversão de Tipos",
+                icon: "fa-exchange-alt",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Transformando Dados</h2>
+                    <p>Às vezes recebemos um número como se fosse texto (vinda de um formulário) e precisamos converter.</p>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">let</span> texto = <span class="code-val">"10"</span>;<br>
+                        <span class="code-highlight">let</span> numero = Number(texto); <span class="code-comment">// Agora é o número 10</span>
+                    </div>
+                </div>
+                `
+            },
+            {
+                title: "O Objeto Math",
+                icon: "fa-infinity",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Matemática Ninja</h2>
+                    <p>O JavaScript tem uma biblioteca pronta para cálculos complexos chamada <b>Math</b>.</p>
+                    <ul class="list-disc pl-6 space-y-2 mt-4">
+                        <li><b>Math.round():</b> Arredonda para o mais próximo;</li>
+                        <li><b>Math.floor():</b> Arredonda sempre para baixo;</li>
+                        <li><b>Math.random():</b> Gera um número aleatório.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Organização do Código",
+                icon: "fa-align-left",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Código Limpo (Clean Code)</h2>
+                    <p>Um código bem escrito é lido como um livro. Use espaços em branco entre operações para deixar tudo respirar.</p>
+                    <div class="code-block mt-4">
+<span class="code-comment">// Ruim</span><br>
+let x=10+5*2;<br><br>
+<span class="code-comment">// Bom</span><br>
+let resultado = 10 + (5 * 2);
+                    </div>
+                `
+            },
+            {
+                title: "Undefined vs Null",
+                icon: "fa-question",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Vazio vs Indefinido</h2>
+                    <p>Existem dois tipos de "nada" na programação:</p>
+                    <ul class="space-y-4 mt-6">
+                        <li><b>undefined:</b> A variável foi criada, mas ainda não colocamos nada nela.</li>
+                        <li><b>null:</b> Nós dissemos explicitamente que a variável está vazia por enquanto.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Constantes: Segurança",
+                icon: "fa-lock",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Por que usar Const?</h2>
+                    <p>Usar <b>const</b> protege seu código de erros acidentais. Se você sabe que a URL do servidor não vai mudar, use const.</p>
+                    <div class="battlefield mt-6">
+                        Se você tentar mudar o valor de uma <b>const</b>, o programa vai parar e dar um erro. Isso é bom para a segurança!
+                    </div>
+                `
+            },
+            {
+                title: "Palavras Reservadas",
+                icon: "fa-ban",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Nomes Proibidos</h2>
+                    <p>Você não pode dar nomes às suas variáveis que sejam comandos do próprio JavaScript.</p>
+                    <p class="mt-4 italic">Exemplos proibidos: let, const, function, if, return, class.</p>
+                `
+            },
+            {
+                title: "Depurando com console.log",
+                icon: "fa-terminal",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">O Melhor Amigo do Dev</h2>
+                    <p>O <b>console.log()</b> é como o computador falando com você. Usamos para ver o que tem dentro de uma variável durante o teste.</p>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">let</span> teste = <span class="code-val">50</span>;<br>
+                        console.log(teste); <span class="code-comment">// Vai aparecer 50 no console do navegador</span>
+                    </div>
+                `
+            },
+            {
+                title: "Erros de Sintaxe",
+                icon: "fa-exclamation-triangle",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Erro de Sintaxe</h2>
+                    <p>É como um erro de ortografia. Se você esquecer um parêntese ou uma vírgula, o código não roda.</p>
+                    <div class="pulo-gato mt-6">
+                        Não se frustre! Erros de sintaxe acontecem com todos. O segredo é ler a mensagem de erro que o navegador te dá.
+                    </div>
+                `
+            },
+            {
+                title: "Erros de Lógica (Semântica)",
+                icon: "fa-brain",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Erro de Lógica</h2>
+                    <p>O código roda, mas o resultado está errado. Ex: Calcular o IMC multiplicando em vez de dividir.</p>
+                    <p class="mt-4">Esses são os erros mais difíceis de achar, pois o computador não te avisa que a ideia está errada.</p>
+                `
+            },
+            {
+                title: "Planejando a Lógica",
+                icon: "fa-map",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Pseudocódigo</h2>
+                    <p>Antes de codar, escreva o que você quer fazer. É o mapa para não se perder na sintaxe.</p>
+                    <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border-2 border-dashed">
+                        1. Receber Peso;<br>
+                        2. Receber Altura;<br>
+                        3. Calcular IMC;<br>
+                        4. Exibir Resultado.
+                    </div>
+                `
+            },
+            {
+                title: "Refatoração",
+                icon: "fa-magic",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Refatoração</h2>
+                    <p>É o ato de melhorar um código que já funciona, deixando-o mais limpo, mais rápido ou mais fácil de ler.</p>
+                    <div class="pulo-gato mt-6">
+                        Primeiro faça funcionar. Depois faça ficar bonito (refatoração).
+                    </div>
+                `
+            },
+            {
+                title: "Resumo e XP Final",
+                icon: "fa-award",
+                content: `
+                    <h2 class="text-4xl font-extrabold mb-4 text-blue-600 tracking-tighter text-center">Material Concluído!</h2>
+                    <p class="text-center text-lg">Você dominou a <b>Anatomia do Código</b>. Agora você sabe como o computador guarda dados e faz contas.</p>
+                    <div class="mt-8 flex justify-center">
+                        <div class="text-center">
+                            <i class="fas fa-medal text-6xl text-yellow-500 mb-2"></i>
+                            <p class="font-bold">Especialista em Variáveis</p>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        let currentIdx = parseInt(localStorage.getItem('savedSlide_d6')) || 0;
+        let userXP = parseInt(localStorage.getItem('savedXP_d6')) || 0;
+        let fontSize = 16;
+
+        function render() {
+            const slide = material[currentIdx];
+            const container = document.getElementById('slide-container');
+            container.innerHTML = slide.content;
+            
+            document.getElementById('page-nav').innerText = `${String(currentIdx + 1).padStart(2, '0')} / ${material.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentIdx + 1) / material.length) * 100}%`;
+            
+            updateTOC();
+            updateXP();
+            localStorage.setItem('savedSlide_d6', currentIdx);
+            document.getElementById('content-viewport').scrollTop = 0;
+        }
+
+        function next() { if (currentIdx < material.length - 1) { currentIdx++; addXP(15); render(); } }
+        function prev() { if (currentIdx > 0) { currentIdx--; render(); } }
+        function goTo(i) { currentIdx = i; render(); }
+
+        function updateTOC() {
+            const list = document.getElementById('toc-list');
+            list.innerHTML = material.map((s, i) => `
+                <button onclick="goTo(${i})" class="w-full flex items-center gap-3 p-2 rounded-lg text-left transition ${i === currentIdx ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                    <i class="fas ${s.icon} w-5"></i>
+                    <span class="text-xs font-bold truncate">${s.title}</span>
+                </button>
+            `).join('');
+        }
+
+        function addXP(v) { userXP += v; localStorage.setItem('savedXP_d6', userXP); updateXP(); }
+
+        function updateXP() {
+            const perc = Math.min((userXP / 800) * 100, 100);
+            document.getElementById('xp-indicator').innerText = Math.floor(perc) + '%';
+            document.getElementById('xp-text').innerText = `${userXP} / 800 XP`;
+            const ranks = ["Iniciante", "Explorador", "Codificador", "Alquimista", "Arquiteto"];
+            document.getElementById('user-rank').innerText = ranks[Math.min(Math.floor(userXP/150), 4)];
+        }
+
+        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+        function adjustFont(d) { fontSize += d; document.getElementById('content-viewport').style.fontSize = fontSize + 'px'; }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
+
+        function calcularIMC() {
+            const peso = parseFloat(document.getElementById('imc-peso').value);
+            const altura = parseFloat(document.getElementById('imc-altura').value);
+            const res = document.getElementById('imc-result');
+            
+            if(!peso || !altura) {
+                res.innerHTML = "Preencha os valores!";
+                res.className = "text-center p-4 rounded-xl font-bold text-lg mt-4 bg-orange-100 text-orange-700";
+                res.classList.remove('hidden');
+                return;
+            }
+
+            const imc = (peso / (altura * altura)).toFixed(2);
+            let cat = "";
+            let color = "";
+
+            if(imc < 18.5) { cat = "Abaixo do Peso"; color = "bg-yellow-500"; }
+            else if(imc < 25) { cat = "Peso Normal"; color = "bg-green-500"; }
+            else { cat = "Acima do Peso"; color = "bg-red-500"; }
+
+            res.innerHTML = `IMC: ${imc}<br><span class="text-sm font-normal">${cat}</span>`;
+            res.className = `text-center p-4 rounded-xl font-bold text-2xl mt-4 text-white shadow-lg ${color}`;
+            res.classList.remove('hidden');
+            addXP(100);
+            document.getElementById('xp-indicator').classList.add('xp-anim');
+            setTimeout(() => document.getElementById('xp-indicator').classList.remove('xp-anim'), 500);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if(e.key === "ArrowRight") next();
+            if(e.key === "ArrowLeft") prev();
+        });
+
+        render();
+    </script>
+</body>
+</html>

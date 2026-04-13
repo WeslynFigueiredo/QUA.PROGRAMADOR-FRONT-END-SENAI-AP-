@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logica de Programação | Fundamentos e Algoritmos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --accent: #10b981;
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+        }
+
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .dark-mode { background-color: var(--bg-dark); color: #f1f5f9; }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 1rem;
+        }
+        .dark-mode .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pulo-gato {
+            border-left: 4px solid #f59e0b;
+            background: #fffbeb;
+            padding: 1.25rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        .dark-mode .pulo-gato { background: #451a03; color: #fde68a; }
+
+        .battlefield {
+            border-left: 4px solid #ef4444;
+            background: #fef2f2;
+            padding: 1.25rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        .dark-mode .battlefield { background: #450a0a; color: #fecaca; }
+
+        pre { font-family: 'Fira Code', monospace; white-space: pre-wrap; }
+
+        .progress-fill { transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-content { animation: fadeIn 0.4s forwards; }
+
+        .xp-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 overflow-x-hidden">
+
+    <div id="xp-popup" class="xp-popup">+50 XP!</div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside id="sidebar" class="w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col hidden lg:flex">
+            <div class="p-6 border-b border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-lg leading-tight tracking-tighter">Lógica de Programação</h1>
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Módulo Introdutório</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto p-4 space-y-1 custom-scrollbar" id="toc-list">
+                <!-- TOC via JS -->
+            </nav>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-100 dark:bg-slate-800">
+                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold" id="user-avatar">?</div>
+                    <div class="flex-1">
+                        <p class="text-xs font-bold text-slate-500">Nível Atual</p>
+                        <p class="text-sm font-bold" id="user-rank">Iniciante da Lógica</p>
+                    </div>
+                    <div class="text-right">
+                        <span id="xp-display" class="text-xs font-mono font-bold text-blue-600">0 XP</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col relative overflow-hidden bg-white dark:bg-slate-950">
+            
+            <header class="h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebarMobile()" class="lg:hidden p-2 text-slate-500"><i class="fas fa-bars"></i></button>
+                    <span class="text-sm font-bold text-slate-400">Fundamentos e Pensamento</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full text-xs font-bold">
+                        <i class="fas fa-text-height text-slate-400"></i>
+                        <button onclick="adjustFont(-1)" class="hover:text-blue-500">A-</button>
+                        <button onclick="adjustFont(1)" class="hover:text-blue-500">A+</button>
+                    </div>
+                    <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-blue-500 transition-colors">
+                        <i id="theme-icon" class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="w-full h-1 bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                <div id="progress-bar" class="h-full bg-blue-600 progress-fill" style="width: 0%"></div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6 md:p-12 lg:p-20" id="content-viewport">
+                <div id="slide-container" class="max-w-4xl mx-auto space-y-8 animate-content">
+                    <!-- Slides renderizados aqui -->
+                </div>
+            </div>
+
+            <footer class="h-20 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 bg-white dark:bg-slate-900">
+                <button onclick="prev()" id="btn-prev" class="px-6 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-2">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <div class="hidden md:flex flex-col items-center">
+                    <span id="page-number" class="text-sm font-bold text-slate-400 font-mono">01 / 30</span>
+                </div>
+                <button onclick="next()" id="btn-next" class="px-8 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 dark:shadow-none transition flex items-center gap-2">
+                    Próximo <i class="fas fa-chevron-right"></i>
+                </button>
+            </footer>
+
+        </main>
+    </div>
+
+    <script>
+        const material = [
+            {
+                id: "welcome",
+                title: "Início da Jornada",
+                icon: "fa-rocket",
+                content: `
+                    <h2 class="text-4xl font-extrabold tracking-tight mb-4">Seu Primeiro Passo na Programação</h2>
+                    <p class="text-lg text-slate-600 dark:text-slate-400">Bem-vindo, futuro desenvolvedor Front-End! Hoje vamos aprender que programar não é sobre "códigos complicados", é sobre <b>resolver problemas</b>.</p>
+                    <div class="pulo-gato mt-6">
+                        <strong>Pulo do Gato:</strong> Um computador é como um gênio da lâmpada muito rápido, mas que entende tudo literalmente. Se você não for específico, ele fará a coisa errada.
+                    </div>
+                `
+            },
+            {
+                id: "logic-real-life",
+                title: "Lógica no Dia a Dia",
+                icon: "fa-mug-hot",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Você já usa Lógica!</h2>
+                    <p class="text-lg">Tudo o que você faz segue uma lógica. Quer ver?</p>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-2xl mt-6">
+                        <h4 class="font-bold mb-4">Desafio Mental: Fazer Café</h4>
+                        <ol class="list-decimal pl-6 space-y-2">
+                            <li>Pegar a cafeteira;</li>
+                            <li>Colocar água no reservatório;</li>
+                            <li>Colocar o filtro e o pó;</li>
+                            <li>Ligar a máquina;</li>
+                            <li>Esperar passar e servir.</li>
+                        </ol>
+                    </div>
+                    <p class="mt-4">Se invertermos o passo 3 com o passo 1, o café funciona? Não. Isso é <b>Sequenciamento Lógico</b>.</p>
+                `
+            },
+            {
+                id: "comp-thinking-intro",
+                title: "Pensamento Computacional",
+                icon: "fa-brain",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">O que é Pensamento Computacional?</h2>
+                    <p>Não é pensar como um robô, mas sim formatar o problema para que ele possa ser resolvido por um. Ele é composto por 4 pilares essenciais que veremos a seguir.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                        <div class="p-4 border border-slate-200 dark:border-slate-800 rounded-xl">
+                            <i class="fas fa-puzzle-piece text-blue-500 mb-2"></i>
+                            <h4 class="font-bold">Decomposição</h4>
+                        </div>
+                        <div class="p-4 border border-slate-200 dark:border-slate-800 rounded-xl">
+                            <i class="fas fa-search text-green-500 mb-2"></i>
+                            <h4 class="font-bold">Padrões</h4>
+                        </div>
+                        <div class="p-4 border border-slate-200 dark:border-slate-800 rounded-xl">
+                            <i class="fas fa-eye-slash text-purple-500 mb-2"></i>
+                            <h4 class="font-bold">Abstração</h4>
+                        </div>
+                        <div class="p-4 border border-slate-200 dark:border-slate-800 rounded-xl">
+                            <i class="fas fa-list-ol text-orange-500 mb-2"></i>
+                            <h4 class="font-bold">Algoritmos</h4>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: "pillar-1",
+                title: "Pilar 1: Decomposição",
+                icon: "fa-scissors",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Decomposição: Dividir para Conquistar</h2>
+                    <p>Pegue um problema grande e quebre em problemas menores.</p>
+                    <div class="battlefield mt-6">
+                        <strong>Exemplo da Indústria:</strong> Criar um site inteiro é difícil. Mas criar o <b>topo</b>, depois o <b>corpo</b> e depois o <b>rodapé</b> separadamente é muito mais fácil.
+                    </div>
+                    <p class="mt-4">Ao decompor, você foca em uma peça por vez.</p>
+                `
+            },
+            {
+                id: "pillar-2",
+                title: "Pilar 2: Padrões",
+                icon: "fa-clone",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Reconhecimento de Padrões</h2>
+                    <p>Quais problemas já resolvemos antes que se parecem com este?</p>
+                    <div class="pulo-gato mt-6">
+                        <strong>Analogia:</strong> Se você sabe fazer uma receita de bolo de chocolate, provavelmente sabe fazer uma de cenoura trocando poucos ingredientes. Na programação, reutilizamos soluções de problemas parecidos.
+                    </div>
+                `
+            },
+            {
+                id: "pillar-3",
+                title: "Pilar 3: Abstração",
+                icon: "fa-ghost",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Abstração: Ignore o que não importa</h2>
+                    <p>Focar apenas na informação essencial para o problema.</p>
+                    <div class="p-6 bg-slate-100 dark:bg-slate-800 rounded-2xl mt-6">
+                        <p><b>Exemplo:</b> Para um GPS, a cor dos prédios não importa. Importa apenas as ruas e o trânsito. Isso é abstrair detalhes visuais para focar na rota.</p>
+                    </div>
+                `
+            },
+            {
+                id: "pillar-4",
+                title: "Pilar 4: Algoritmos",
+                icon: "fa-route",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Algoritmos: O Passo a Passo</h2>
+                    <p>É a criação da solução final. Uma lista ordenada de instruções.</p>
+                    <div class="bg-slate-900 text-green-400 p-6 rounded-2xl font-mono mt-6">
+                        1. Início<br>
+                        2. Ação A<br>
+                        3. Ação B<br>
+                        4. Fim
+                    </div>
+                `
+            },
+            {
+                id: "software-intro",
+                title: "O que é Software?",
+                icon: "fa-laptop-code",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Software: A Alma do Negócio</h2>
+                    <p>Hardware é o que você chuta, Software é o que você xinga? Quase isso!</p>
+                    <p class="mt-4">Software são as instruções (lógica) gravadas em um suporte físico. Sem software, seu celular é só um pedaço de vidro e metal caro.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                        <div class="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                            <h4 class="font-bold text-blue-600">Hardware</h4>
+                            <p class="text-sm">Peças físicas: Tela, Memória, Processador.</p>
+                        </div>
+                        <div class="p-6 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
+                            <h4 class="font-bold text-purple-600">Software</h4>
+                            <p class="text-sm">Lógica: Android, Windows, Instagram.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: "software-base",
+                title: "Software de Base",
+                icon: "fa-microchip",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Software de Base: O Alicerce</h2>
+                    <p>É o software que cuida do computador para que os outros softwares funcionem.</p>
+                    <ul class="list-disc pl-6 space-y-4 mt-6">
+                        <li><b>Sistemas Operacionais:</b> Windows, Linux, Android.</li>
+                        <li><b>Drivers:</b> Instruções para o PC falar com a impressora.</li>
+                        <li><b>Firmware:</b> Software que vem gravado direto no chip da placa-mãe.</li>
+                    </ul>
+                `
+            },
+            {
+                id: "software-app",
+                title: "Software de Aplicativo",
+                icon: "fa-mobile-alt",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Software de Aplicativo</h2>
+                    <p>Criado para o usuário realizar tarefas específicas.</p>
+                    <div class="flex flex-wrap gap-3 mt-6">
+                        <span class="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-full text-sm">Navegadores (Chrome)</span>
+                        <span class="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-full text-sm">Editores de Texto (Word)</span>
+                        <span class="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-full text-sm">Jogos</span>
+                        <span class="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-full text-sm">Redes Sociais</span>
+                    </div>
+                `
+            },
+            {
+                id: "algoritmo-descritivo",
+                title: "Algoritmo Descritivo",
+                icon: "fa-font",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Algoritmo Descritivo: Escrevendo em Português</h2>
+                    <p>Antes de usar linguagens como JavaScript, usamos nossa própria língua para planejar.</p>
+                    <div class="pulo-gato mt-6">
+                        <strong>Dica:</strong> Se você não consegue explicar o passo a passo em português, você não conseguirá programar. O planejamento é 80% do trabalho.
+                    </div>
+                `
+            },
+            {
+                id: "example-tire",
+                title: "Exemplo: Trocar Pneu",
+                icon: "fa-car",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Algoritmo: Trocar um Pneu Furado</h2>
+                    <div class="bg-slate-900 text-green-400 p-8 rounded-2xl font-mono text-sm">
+                        1. Estacionar em local plano;<br>
+                        2. Pegar o macaco e o estepe;<br>
+                        3. Afrouxar os parafusos;<br>
+                        4. Levantar o carro com o macaco;<br>
+                        5. Remover o pneu furado;<br>
+                        6. Colocar o estepe;<br>
+                        7. Apertar levemente os parafusos;<br>
+                        8. Descer o carro e apertar tudo.
+                    </div>
+                `
+            },
+            {
+                id: "logic-structure",
+                title: "Estrutura de um Algoritmo",
+                icon: "fa-sitemap",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Início, Meio e Fim</h2>
+                    <p>Todo algoritmo bem feito precisa ser:</p>
+                    <div class="space-y-4 mt-6">
+                        <div class="flex gap-4 items-center">
+                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">1</div>
+                            <p><b>Finito:</b> Ele tem que ter um fim.</p>
+                        </div>
+                        <div class="flex gap-4 items-center">
+                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">2</div>
+                            <p><b>Claro:</b> Não pode ter instruções ambíguas.</p>
+                        </div>
+                        <div class="flex gap-4 items-center">
+                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">3</div>
+                            <p><b>Ordenado:</b> A sequência dos passos importa.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: "real-world-senai",
+                title: "O SENAI e o 5S",
+                icon: "fa-industry",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Lógica Aplicada: Metodologia 5S</h2>
+                    <p>No SENAI, usamos o 5S para organizar ambientes. Isso também é um algoritmo!</p>
+                    <ol class="list-decimal pl-6 mt-6 space-y-2 italic">
+                        <li>Seiri (Descarte) - Remova o que não serve;</li>
+                        <li>Seiton (Organização) - Lugar para cada coisa;</li>
+                        <li>Seiso (Limpeza) - Mantenha limpo;</li>
+                        <li>Seiketsu (Padronização) - Crie regras;</li>
+                        <li>Shitsuke (Autodisciplina) - Siga sempre.</li>
+                    </ol>
+                    <div class="pulo-gato mt-4">Programar um site sem organização (5S) gera um código impossível de consertar depois.</div>
+                `
+            },
+            {
+                id: "case-login-intro",
+                title: "Desafio: Sistema de Login",
+                icon: "fa-user-lock",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Seu Primeiro Caso Real: Login</h2>
+                    <p>Você foi contratado para criar a lógica de entrada de um site. O que acontece na cabeça do computador quando você clica em "Entrar"?</p>
+                    <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=800&auto=format&fit=crop" class="w-full h-48 object-cover rounded-xl mt-6 shadow-md" alt="Login interface">
+                `
+            },
+            {
+                id: "case-login-steps",
+                title: "Decompondo o Login",
+                icon: "fa-tasks",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Quebrando o Login em Partes</h2>
+                    <ol class="list-decimal pl-6 space-y-4 mt-6">
+                        <li><b>Entrada:</b> Receber o e-mail e a senha do usuário.</li>
+                        <li><b>Processamento:</b> Comparar com o banco de dados.</li>
+                        <li><b>Saída:</b> Deixar entrar ou mostrar mensagem de erro.</li>
+                    </ol>
+                    <div class="battlefield mt-6">
+                        <strong>Cenário de Crise:</strong> Se você esquecer de pedir a senha, qualquer um entra. A lógica é a primeira barreira de segurança!
+                    </div>
+                `
+            },
+            {
+                id: "algo-login-desc",
+                title: "Algoritmo de Login",
+                icon: "fa-file-alt",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">O Algoritmo em Português</h2>
+                    <div class="bg-slate-900 text-green-400 p-8 rounded-2xl font-mono text-sm leading-relaxed">
+                        1. Início<br>
+                        2. Pedir e-mail;<br>
+                        3. Pedir senha;<br>
+                        4. <b>SE</b> e-mail e senha estiverem corretos:<br>
+                        &nbsp;&nbsp;&nbsp;5. Mostrar "Sucesso";<br>
+                        &nbsp;&nbsp;&nbsp;6. Abrir o site;<br>
+                        7. <b>SENÃO:</b><br>
+                        &nbsp;&nbsp;&nbsp;8. Mostrar "E-mail ou senha inválidos";<br>
+                        9. Fim
+                    </div>
+                `
+            },
+            {
+                id: "case-login-simulator",
+                title: "Simulador de Lógica de Login",
+                icon: "fa-vial",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Experimente a Lógica</h2>
+                    <p class="mb-4">Este simulador segue exatamente os passos do algoritmo anterior.</p>
+                    <div class="glass-card p-6 space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">E-mail</label>
+                            <input type="text" id="sim-email" class="w-full p-2 border rounded-lg dark:bg-slate-800" placeholder="user@email.com">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Senha</label>
+                            <input type="password" id="sim-pass" class="w-full p-2 border rounded-lg dark:bg-slate-800" placeholder="1234">
+                        </div>
+                        <button onclick="testLogin()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg">Executar Algoritmo</button>
+                        <div id="sim-result" class="p-3 rounded-lg text-center font-bold hidden"></div>
+                    </div>
+                `
+            },
+            {
+                id: "errors-intro",
+                title: "Erros de Lógica",
+                icon: "fa-bug",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Quando a Lógica Falha</h2>
+                    <p>O código pode estar "escrito certo", mas a "ideia estar errada".</p>
+                    <div class="p-6 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-200 dark:border-red-800 mt-6">
+                        <p><b>Erro Comum:</b> Deixar o usuário entrar sem validar o campo vazio. O site não "quebra", mas sua segurança sim.</p>
+                    </div>
+                `
+            },
+            {
+                id: "pbl-vip",
+                title: "Desafio PBL: Acesso VIP",
+                icon: "fa-ticket-alt",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Desafio: Porteiro de Evento</h2>
+                    <p>Você é o programador de um tablet de portaria. Escreva o algoritmo mentalmente para:</p>
+                    <div class="pulo-gato mt-6">
+                        <ul class="list-disc pl-6 space-y-2">
+                            <li>Se tiver <b>Convite</b>: Pode entrar;</li>
+                            <li>Se for <b>Palestrante</b>: Pode entrar (sem convite);</li>
+                            <li>Se não for nenhum dos dois: Bloqueado.</li>
+                        </ul>
+                    </div>
+                    <p class="mt-4 italic">Isso é usar a lógica de "OU" (Disjunção).</p>
+                `
+            },
+            {
+                id: "logical-operators-intro",
+                title: "Pequena Dose de Lógica",
+                icon: "fa-balance-scale",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">E vs OU</h2>
+                    <p>Programadores usam essas duas palavras o tempo todo.</p>
+                    <div class="grid grid-cols-2 gap-4 mt-6">
+                        <div class="p-4 border rounded-xl">
+                            <h4 class="font-bold text-blue-500">E (AND)</h4>
+                            <p class="text-xs">As duas coisas devem ser verdadeiras. (Ex: Ter e-mail E ter senha).</p>
+                        </div>
+                        <div class="p-4 border rounded-xl">
+                            <h4 class="font-bold text-green-500">OU (OR)</h4>
+                            <p class="text-xs">Pelo menos uma deve ser verdadeira. (Ex: Ter convite OU ser VIP).</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: "hardware-software-sync",
+                title: "Hardware + Software",
+                icon: "fa-sync",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">A Dança entre eles</h2>
+                    <p>Como o software controla o hardware?</p>
+                    <p class="mt-4">O Software envia pulsos elétricos para o Hardware. É como o cérebro (software) mandando o braço (hardware) levantar uma caneca.</p>
+                    <div class="battlefield mt-6">
+                        <strong>Curiosidade:</strong> Se o seu Windows trava, o software parou de mandar ordens, mas o hardware continua lá, ligado, sem saber o que fazer.
+                    </div>
+                `
+            },
+            {
+                id: "abstract-data",
+                title: "Abstraindo Dados",
+                icon: "fa-database",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">O que guardamos no código?</h2>
+                    <p>Lógica serve para manipular dados. No login, os dados são "texto". Em um jogo, são "números" (vida, posição).</p>
+                    <div class="p-6 bg-slate-100 dark:bg-slate-800 rounded-2xl mt-6">
+                        <p>Nesta fase, entenda apenas que <b>Dados</b> são a matéria-prima e a <b>Lógica</b> é a ferramenta que os molda.</p>
+                    </div>
+                `
+            },
+            {
+                id: "algorithm-best-practices",
+                title: "Boas Práticas",
+                icon: "fa-check-double",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Como escrever bons Algoritmos?</h2>
+                    <ul class="list-disc pl-6 space-y-4 mt-6">
+                        <li><b>Seja Direto:</b> Não enrole;</li>
+                        <li><b>Um passo por vez:</b> Não faça duas coisas na mesma linha;</li>
+                        <li><b>Pense nas Exceções:</b> E se a internet cair? E se o pneu reserva também estiver furado?</li>
+                    </ul>
+                `
+            },
+            {
+                id: "industry-google",
+                title: "Como o Google faz?",
+                icon: "fa-search",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Lógica em Grande Escala</h2>
+                    <p>O Google processa trilhões de páginas. Como?</p>
+                    <div class="pulo-gato mt-6">
+                        <strong>Algoritmo de Busca:</strong> Ele usa a <b>Decomposição</b> para dividir a internet em partes e a <b>Abstração</b> para ignorar sites repetidos ou de baixa qualidade.
+                    </div>
+                `
+            },
+            {
+                id: "flashcards-1",
+                title: "Revisão Rápida",
+                icon: "fa-bolt",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Flashcards: Teste sua memória!</h2>
+                    <div class="space-y-4 mt-6">
+                        <details class="p-4 border rounded-xl cursor-pointer">
+                            <summary class="font-bold">O que é um algoritmo?</summary>
+                            <p class="mt-2 text-slate-500">Uma sequência finita de passos para resolver um problema.</p>
+                        </details>
+                        <details class="p-4 border rounded-xl cursor-pointer">
+                            <summary class="font-bold">Dê um exemplo de Software de Base.</summary>
+                            <p class="mt-2 text-slate-500">Sistema Operacional (Windows, Linux, Android).</p>
+                        </details>
+                        <details class="p-4 border rounded-xl cursor-pointer">
+                            <summary class="font-bold">Qual o pilar da Abstração?</summary>
+                            <p class="mt-2 text-slate-500">Ignorar detalhes irrelevantes e focar no essencial.</p>
+                        </details>
+                    </div>
+                `
+            },
+            {
+                id: "logic-puzzle",
+                title: "Enigma de Lógica",
+                icon: "fa-puzzle-piece",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Desafio: O Lobo, o Bode e a Alface</h2>
+                    <p>Você precisa levar os três para o outro lado do rio em um barco que só cabe você e mais um.</p>
+                    <p class="mt-2 text-sm text-red-500">* Se o lobo ficar sozinho com o bode, ele o come. Se o bode ficar sozinho com a alface, ele a come.</p>
+                    <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl mt-4 italic">
+                        Tente criar o algoritmo (passo a passo) para atravessar todos em segurança.
+                    </div>
+                `
+            },
+            {
+                id: "first-contact-review",
+                title: "Resumo do Dia",
+                icon: "fa-graduation-cap",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">O que aprendemos hoje?</h2>
+                    <p class="text-lg">Você deu o primeiro passo para se tornar um desenvolvedor. Você aprendeu a estruturar seu raciocínio antes de codificar.</p>
+                    <div class="grid grid-cols-2 gap-4 mt-6 text-sm">
+                        <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded">Pensamento Computacional</div>
+                        <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded">Software vs Hardware</div>
+                        <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded">Algoritmo de Login</div>
+                        <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded">Algoritmo Descritivo</div>
+                    </div>
+                `
+            },
+            {
+                id: "faq",
+                title: "Dúvidas Frequentes",
+                icon: "fa-question-circle",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">FAQ</h2>
+                    <div class="space-y-4">
+                        <p><b>P: Preciso saber matemática?</b><br>R: Para lógica básica, você precisa saber somar, subtrair e comparar. O foco é o raciocínio.</p>
+                        <p><b>P: Quando vou escrever código real?</b><br>R: Em breve! Mas primeiro sua mente precisa estar treinada para pensar como o computador.</p>
+                    </div>
+                `
+            },
+            {
+                id: "next-steps",
+                title: "Próximos Passos",
+                icon: "fa-flag-checkered",
+                content: `
+                    <h2 class="text-4xl font-extrabold mb-4 text-blue-600 tracking-tighter">Parabéns!</h2>
+                    <p class="text-xl">Você concluiu o Material.</p>
+
+                `
+            }
+        ];
+
+        let currentIdx = parseInt(localStorage.getItem('savedSlide_d1')) || 0;
+        let userXP = parseInt(localStorage.getItem('savedXP_d1')) || 0;
+        let fontSize = 16;
+
+        function render() {
+            const slide = material[currentIdx];
+            const container = document.getElementById('slide-container');
+            
+            container.style.opacity = 0;
+            
+            setTimeout(() => {
+                container.innerHTML = slide.content;
+                document.getElementById('page-number').innerText = `${String(currentIdx + 1).padStart(2, '0')} / ${material.length}`;
+                document.getElementById('progress-bar').style.width = `${((currentIdx + 1) / material.length) * 100}%`;
+                
+                updateTOC();
+                localStorage.setItem('savedSlide_d1', currentIdx);
+                
+                container.style.opacity = 1;
+                document.getElementById('content-viewport').scrollTop = 0;
+            }, 200);
+
+            updateXPDisplay();
+            checkButtons();
+        }
+
+        function next() {
+            if (currentIdx < material.length - 1) {
+                currentIdx++;
+                addXP(15);
+                render();
+            }
+        }
+
+        function prev() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                render();
+            }
+        }
+
+        function goTo(idx) {
+            currentIdx = idx;
+            render();
+        }
+
+        function updateTOC() {
+            const list = document.getElementById('toc-list');
+            list.innerHTML = material.map((item, index) => `
+                <button onclick="goTo(${index})" class="w-full flex items-center gap-3 p-3 rounded-lg text-left transition ${index === currentIdx ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                    <i class="fas ${item.icon} w-5 text-center"></i>
+                    <span class="text-sm font-semibold truncate">${item.title}</span>
+                </button>
+            `).join('');
+        }
+
+        function addXP(val) {
+            userXP += val;
+            localStorage.setItem('savedXP_d1', userXP);
+            updateXPDisplay();
+            if (val > 10) showXPPopup(val);
+        }
+
+        function updateXPDisplay() {
+            document.getElementById('xp-display').innerText = `${userXP} XP`;
+            const ranks = ["Novato da Lógica", "Aspirante a Dev", "Pensador Analítico", "Mestre dos Algoritmos", "Lenda do Código"];
+            const rankIdx = Math.min(Math.floor(userXP / 200), ranks.length - 1);
+            document.getElementById('user-rank').innerText = ranks[rankIdx];
+            document.getElementById('user-avatar').innerText = ranks[rankIdx].charAt(0);
+        }
+
+        function showXPPopup(val) {
+            const pop = document.getElementById('xp-popup');
+            pop.innerText = `+${val} XP!`;
+            pop.style.display = 'block';
+            setTimeout(() => pop.style.display = 'none', 1500);
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            document.getElementById('theme-icon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        function adjustFont(delta) {
+            fontSize += delta;
+            document.getElementById('content-viewport').style.fontSize = `${fontSize}px`;
+        }
+
+        function toggleSidebarMobile() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('fixed');
+            sidebar.classList.toggle('inset-0');
+            sidebar.classList.toggle('z-50');
+        }
+
+        function checkButtons() {
+            const btnPrev = document.getElementById('btn-prev');
+            btnPrev.disabled = currentIdx === 0;
+            btnPrev.style.opacity = currentIdx === 0 ? 0.5 : 1;
+        }
+
+        function testLogin() {
+            const email = document.getElementById('sim-email').value;
+            const pass = document.getElementById('sim-pass').value;
+            const result = document.getElementById('sim-result');
+            
+            result.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-yellow-100', 'text-yellow-700');
+            
+            if (email === "" || pass === "") {
+                result.innerText = "⚠️ Lógica: Campos vazios não são permitidos!";
+                result.classList.add('bg-yellow-100', 'text-yellow-700');
+            } else if (!email.includes('@')) {
+                result.innerText = "❌ Algoritmo: E-mail inválido (falta o @).";
+                result.classList.add('bg-red-100', 'text-red-700');
+            } else {
+                result.innerText = "✅ Algoritmo: Acesso Liberado! Dados processados.";
+                result.classList.add('bg-green-100', 'text-green-700');
+                addXP(50);
+            }
+            result.classList.remove('hidden');
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === "ArrowRight") next();
+            if (e.key === "ArrowLeft") prev();
+        });
+
+        render();
+    </script>
+</body>
+</html>

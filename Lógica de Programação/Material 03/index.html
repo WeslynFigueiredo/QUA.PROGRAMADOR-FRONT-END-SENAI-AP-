@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lógica de Programação | Lógica de Comparação e Operadores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+        :root {
+            --primary: #8b5cf6;
+            --bg-dark: #0f172a;
+            --code-bg: #1e293b;
+        }
+
+        body { font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
+        .dark-mode { background-color: var(--bg-dark); color: #f1f5f9; }
+        
+        .pulo-gato { border-left: 4px solid #f59e0b; background: #fffbeb; padding: 1.25rem; border-radius: 0.5rem; color: #92400e; }
+        .dark-mode .pulo-gato { background: #451a03; color: #fde68a; }
+
+        .battlefield { border-left: 4px solid #ef4444; background: #fef2f2; padding: 1.25rem; border-radius: 0.5rem; color: #991b1b; }
+        .dark-mode .battlefield { background: #450a0a; color: #fecaca; }
+
+        .code-block { font-family: 'Fira Code', monospace; background: var(--code-bg); color: #94a3b8; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        .code-highlight { color: #8b5cf6; font-weight: bold; }
+        .code-val { color: #fbbf24; }
+        .code-operator { color: #f472b6; font-weight: bold; }
+
+        .progress-fill { transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .logic-card { border: 2px solid #e2e8f0; transition: 0.3s; }
+        .logic-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .dark-mode .logic-card { border-color: #334155; }
+
+        @keyframes success-pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        .solved { animation: success-pulse 1s infinite; border-color: #10b981 !important; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col hidden lg:flex">
+            <div class="p-6 border-b border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center text-white"><i class="fas fa-balance-scale"></i></div>
+                    <div>
+                        <h1 class="font-bold">Lógica de Programação</h1>
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Material 03</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto p-4 space-y-1 custom-scrollbar" id="toc-list"></nav>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+                <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-xl flex items-center gap-3">
+                    <div id="xp-indicator" class="w-12 h-12 rounded-full border-4 border-purple-500 flex items-center justify-center font-bold text-xs text-purple-600">0%</div>
+                    <div>
+                        <p class="text-[10px] font-bold uppercase text-slate-500">Poder de Decisão</p>
+                        <p id="user-rank" class="text-sm font-bold">Iniciante</p>
+                        <p id="xp-text" class="text-[10px] font-mono">0 / 800 XP</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col bg-white dark:bg-slate-950">
+            
+            <header class="h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-10">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-slate-500"><i class="fas fa-bars"></i></button>
+                    <span class="text-sm font-bold text-slate-400">Operadores e Comparações</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full text-xs font-bold">
+                        <button onclick="adjustFont(-1)" class="hover:text-purple-500">A-</button>
+                        <button onclick="adjustFont(1)" class="hover:text-purple-500">A+</button>
+                    </div>
+                    <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"><i class="fas fa-moon"></i></button>
+                </div>
+            </header>
+
+            <div class="w-full h-1 bg-slate-100 dark:bg-slate-800">
+                <div id="progress-bar" class="h-full bg-purple-600 progress-fill" style="width: 0%"></div>
+            </div>
+
+            <div id="content-viewport" class="flex-1 overflow-y-auto p-6 md:p-12 lg:p-20 text-[16px]">
+                <div id="slide-container" class="max-w-4xl mx-auto space-y-8 animate-fade">
+                    <!-- Conteúdo via JS -->
+                </div>
+            </div>
+
+            <footer class="h-20 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 bg-white dark:bg-slate-900">
+                <button onclick="prev()" class="px-6 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition"><i class="fas fa-chevron-left mr-2"></i> Anterior</button>
+                <div class="text-sm font-bold text-slate-400 font-mono" id="page-nav">01 / 30</div>
+                <button onclick="next()" class="px-8 py-2 rounded-xl bg-purple-600 text-white font-bold hover:bg-purple-700 shadow-lg transition">Próximo <i class="fas fa-chevron-right ml-2"></i></button>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        const material = [
+            {
+                title: "Introdução",
+                icon: "fa-door-open",
+                content: `
+                    <h2 class="text-4xl font-extrabold mb-4">A Lógica das Decisões</h2>
+                    <p class="text-lg">Na última aula, aprendemos a guardar dados em variáveis. Hoje, vamos aprender a <b>comparar</b> esses dados para que o computador possa tomar decisões sozinho.</p>
+                    <div class="pulo-gato mt-6">
+                        <strong>Dica:</strong> Se as variáveis são as "caixas", os operadores lógicos são os "juízes" que decidem se o jogo continua ou para.
+                    </div>
+                `
+            },
+            {
+                title: "Operadores Relacionais I",
+                icon: "fa-equals",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Igualdade e Diferença</h2>
+                    <p>Usamos esses operadores para comparar se dois valores são iguais ou diferentes.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                        <div class="logic-card p-6 bg-white dark:bg-slate-800 rounded-xl">
+                            <h4 class="font-bold text-purple-600 mb-2">== (Igual a)</h4>
+                            <p class="text-sm italic">5 == 5 é VERDADEIRO</p>
+                        </div>
+                        <div class="logic-card p-6 bg-white dark:bg-slate-800 rounded-xl">
+                            <h4 class="font-bold text-purple-600 mb-2">!= (Diferente de)</h4>
+                            <p class="text-sm italic">5 != 3 é VERDADEIRO</p>
+                        </div>
+                    </div>
+                    <div class="battlefield mt-6">
+                        <strong>Erro Comum:</strong> Usar apenas um <b>=</b> para comparar. Lembre-se: um <b>=</b> guarda valor (atribuição), dois <b>==</b> comparam valor!
+                    </div>
+                `
+            },
+            {
+                title: "Operadores Relacionais II",
+                icon: "fa-greater-than-equal",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Maior, Menor e Limites</h2>
+                    <p>Essenciais para validar idades, preços e quantidades.</p>
+                    <ul class="space-y-4 mt-6">
+                        <li class="flex items-center gap-4"><span class="font-mono bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">></span> Maior que</li>
+                        <li class="flex items-center gap-4"><span class="font-mono bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded"><</span> Menor que</li>
+                        <li class="flex items-center gap-4"><span class="font-mono bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">>=</span> Maior ou igual</li>
+                        <li class="flex items-center gap-4"><span class="font-mono bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded"><=</span> Menor ou igual</li>
+                    </ul>
+                `
+            },
+            {
+                title: "O Resultado Booleano",
+                icon: "fa-check-circle",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">O Resultado é sempre Sim ou Não</h2>
+                    <p>Toda comparação gera um valor do tipo <b>Boolean</b>: ou é <span class="text-green-500 font-bold">true</span> ou é <span class="text-red-500 font-bold">false</span>.</p>
+                    <div class="code-block mt-6">
+                        <span class="code-highlight">let</span> idade = <span class="code-val">18</span>;<br>
+                        <span class="code-highlight">let</span> podeEntrar = idade <span class="code-operator">>=</span> <span class="code-val">18</span>;<br>
+                        console.log(podeEntrar); <span class="text-slate-500">// Resultado: true</span>
+                    </div>
+                `
+            },
+            {
+                title: "Operadores Lógicos: AND",
+                icon: "fa-handshake",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Operador AND (&&)</h2>
+                    <p>O operador "E" exige que <b>TODAS</b> as condições sejam verdadeiras para o resultado final ser verdadeiro.</p>
+                    <div class="pulo-gato mt-6">
+                        <strong>Analogia:</strong> Para entrar no cinema VIP, você precisa ter o <b>Ingresso</b> E ter <b>Mais de 18 anos</b>. Se faltar um, você não entra.
+                    </div>
+                    <div class="code-block mt-4">
+                        <span class="code-val">true</span> <span class="code-operator">&&</span> <span class="code-val">true</span> = <span class="text-green-500 font-bold">true</span><br>
+                        <span class="code-val">true</span> <span class="code-operator">&&</span> <span class="code-val">false</span> = <span class="text-red-500 font-bold">false</span>
+                    </div>
+                `
+            },
+            {
+                title: "Operadores Lógicos: OR",
+                icon: "fa-arrows-alt-h",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Operador OR (||)</h2>
+                    <p>O operador "OU" é mais flexível. Ele só precisa que <b>PELO MENOS UMA</b> condição seja verdadeira.</p>
+                    <div class="pulo-gato mt-6">
+                        <strong>Analogia:</strong> Você pode entrar na festa se tiver o <b>Convite</b> OU se for um <b>Palestrante</b>. Tendo um dos dois, o acesso é liberado.
+                    </div>
+                    <div class="code-block mt-4">
+                        <span class="code-val">true</span> <span class="code-operator">||</span> <span class="code-val">false</span> = <span class="text-green-500 font-bold">true</span><br>
+                        <span class="code-val">false</span> <span class="code-operator">||</span> <span class="code-val">false</span> = <span class="text-red-500 font-bold">false</span>
+                    </div>
+                `
+            },
+            {
+                title: "Operador Lógico: NOT",
+                icon: "fa-exclamation",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Operador NOT (!)</h2>
+                    <p>O operador de negação inverte o valor. O que é verdadeiro vira falso, e vice-versa.</p>
+                    <div class="code-block mt-6">
+                        <span class="code-highlight">let</span> chovendo = <span class="code-val">true</span>;<br>
+                        console.log(<span class="code-operator">!</span>chovendo); <span class="text-slate-500">// Resultado: false</span>
+                    </div>
+                    <p class="mt-4">Usamos muito para verificar se algo "NÃO está vazio" ou "NÃO está logado".</p>
+                `
+            },
+            {
+                title: "Tabela Verdade",
+                icon: "fa-table",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Tabela Verdade: O Guia do Dev</h2>
+                    <p>É um resumo de todas as combinações possíveis. No Front-End, isso ajuda a evitar bugs de validação.</p>
+                    <div class="overflow-x-auto mt-6">
+                        <table class="w-full text-sm text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 dark:bg-slate-800">
+                                    <th class="p-3 border">A</th><th class="p-3 border">B</th><th class="p-3 border">A && B</th><th class="p-3 border">A || B</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="p-3 border">V</td><td class="p-3 border">V</td><td class="p-3 border font-bold text-green-500">V</td><td class="p-3 border font-bold text-green-500">V</td></tr>
+                                <tr><td class="p-3 border">V</td><td class="p-3 border">F</td><td class="p-3 border font-bold text-red-500">F</td><td class="p-3 border font-bold text-green-500">V</td></tr>
+                                <tr><td class="p-3 border">F</td><td class="p-3 border">V</td><td class="p-3 border font-bold text-red-500">F</td><td class="p-3 border font-bold text-green-500">V</td></tr>
+                                <tr><td class="p-3 border">F</td><td class="p-3 border">F</td><td class="p-3 border font-bold text-red-500">F</td><td class="p-3 border font-bold text-red-500">F</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                title: "Precedência Lógica",
+                icon: "fa-sort-numeric-down",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Quem manda na Lógica?</h2>
+                    <p>Assim como na matemática, existe uma ordem de execução:</p>
+                    <ol class="list-decimal pl-6 space-y-2 mt-6">
+                        <li><b>! (NOT)</b> - Primeiro negamos;</li>
+                        <li><b>&& (AND)</b> - Depois verificamos as junções;</li>
+                        <li><b>|| (OR)</b> - Por último as alternativas.</li>
+                    </ol>
+                    <div class="pulo-gato mt-4 text-xs italic">
+                        <strong>Dica:</strong> Use parênteses para garantir que sua lógica seja executada na ordem que você quer.
+                    </div>
+                `
+            },
+            {
+                title: "Lógica Proposicional",
+                icon: "fa-scroll",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Lógica Proposicional</h2>
+                    <p>É o estudo de frases que podem ser apenas Verdadeiras ou Falsas. Chamamos essas frases de <b>Proposições</b>.</p>
+                    <div class="p-6 bg-slate-100 dark:bg-slate-800 rounded-2xl mt-6">
+                        <p class="mb-2"><b>A:</b> O usuário digitou o e-mail.</p>
+                        <p class="mb-2"><b>B:</b> O e-mail contém "@".</p>
+                        <p class="font-bold text-purple-600">Lógica: A && B</p>
+                    </div>
+                `
+            },
+            {
+                title: "Operadores Estritos (===)",
+                icon: "fa-shield-alt",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">O Operador Estrito (===)</h2>
+                    <p>No JavaScript, existe o <b>===</b> (três iguais). Ele compara o <b>Valor</b> e o <b>Tipo de Dado</b>.</p>
+                    <div class="grid grid-cols-2 gap-4 mt-6">
+                        <div class="p-4 border rounded-lg">
+                            <code class="text-xs">5 == "5"</code><br>
+                            <span class="text-green-500 font-bold">true</span> (Converteu o texto)
+                        </div>
+                        <div class="p-4 border rounded-lg">
+                            <code class="text-xs">5 === "5"</code><br>
+                            <span class="text-red-500 font-bold">false</span> (Tipos diferentes!)
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Short-Circuit Evaluation",
+                icon: "fa-bolt",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Avaliação Curto-Circuito</h2>
+                    <p>O computador é preguiçoso (eficiente). Se em um <b>&&</b> a primeira parte for falsa, ele nem olha a segunda.</p>
+                    <div class="pulo-gato mt-6">
+                        Isso economiza memória! Se o usuário nem digitou o e-mail, o PC não perde tempo tentando validar se o e-mail é válido.
+                    </div>
+                `
+            },
+            {
+                title: "Comparações de Texto",
+                icon: "fa-font",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Comparando Strings</h2>
+                    <p>Podemos comparar textos alfabeticamente. O computador usa a tabela ASCII (os códigos dos caracteres) para isso.</p>
+                    <div class="code-block mt-4">
+                        console.log(<span class="code-val">"Maçã"</span> <span class="code-operator">==</span> <span class="code-val">"Banana"</span>); <span class="text-slate-500">// false</span><br>
+                        console.log(<span class="code-val">"a"</span> <span class="code-operator"><</span> <span class="code-val">"b"</span>); <span class="text-slate-500">// true</span>
+                    </div>
+                `
+            },
+            {
+                title: "Inversão de Lógica",
+                icon: "fa-undo",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Inversão de Lógica</h2>
+                    <p>Às vezes é mais fácil perguntar "O que NÃO pode" do que "O que pode".</p>
+                    <div class="code-block mt-6">
+                        <span class="code-highlight">let</span> sistemaOff = <span class="code-val">true</span>;<br>
+                        <span class="code-highlight">if</span> (<span class="code-operator">!</span>sistemaOff) { ... }
+                    </div>
+                    <p class="mt-4">Isso ajuda a criar códigos mais "limpos" e fáceis de ler.</p>
+                `
+            },
+            {
+                title: "Exemplo Prático: Formulário",
+                icon: "fa-wpforms",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Caso Real: Validação</h2>
+                    <p>Imagine um formulário onde o botão de "Enviar" só aparece se:</p>
+                    <div class="p-6 bg-slate-100 dark:bg-slate-800 rounded-2xl mt-6 space-y-2">
+                        <p>1. O nome tiver mais de 3 letras <b>E</b></p>
+                        <p>2. O e-mail for válido <b>E</b></p>
+                        <p>3. Os termos forem aceitos.</p>
+                    </div>
+                    <p class="mt-4 font-mono text-sm">Lógica: (nomeLen > 3) && emailOk && termosOk</p>
+                `
+            },
+            {
+                title: "Valores Falsy",
+                icon: "fa-ghost",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Valores "Falsy"</h2>
+                    <p>Existem valores que não são o booleano <b>false</b>, mas o computador os trata como tal em comparações.</p>
+                    <div class="flex flex-wrap gap-2 mt-6">
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs">0</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs">"" (Texto vazio)</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs">null</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs">undefined</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs">NaN</span>
+                    </div>
+                `
+            },
+            {
+                title: "Valores Truthy",
+                icon: "fa-sun",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Valores "Truthy"</h2>
+                    <p>Qualquer valor que não seja Falsy é considerado <b>true</b> pelo computador.</p>
+                    <p class="mt-4">Isso é muito útil para checar se uma variável tem algum conteúdo antes de usá-la.</p>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">let</span> nome = <span class="code-val">"Senai"</span>;<br>
+                        <span class="code-highlight">if</span> (nome) { ... } <span class="code-comment">// Entra pois tem texto!</span>
+                    </div>
+                `
+            },
+            {
+                title: "Enigma das Portas: Intro",
+                icon: "fa-gamepad",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">O Enigma das Portas</h2>
+                    <p class="text-lg">Você está diante de uma porta mágica. Para abri-la, você precisa resolver as proposições lógicas.</p>
+                    <div class="battlefield mt-6">
+                        <strong>Instruções:</strong> No próximo slide, você terá que combinar as chaves corretas baseando-se nos operadores lógicos. Cada acerto libera um checkpoint de XP.
+                    </div>
+                `
+            },
+            {
+                title: "O Enigma das Portas",
+                icon: "fa-key",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4 text-center">Desafio de Lógica</h2>
+                    <div id="game-container" class="glass p-8 rounded-3xl space-y-6">
+                        <div class="text-center p-4 bg-slate-900 text-purple-400 font-mono rounded-xl border border-purple-500 shadow-lg shadow-purple-500/20">
+                            <span id="logic-expression">Carregando Enigma...</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="checkGame(true)" class="py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 shadow-lg shadow-green-500/20 transition">VERDADEIRO</button>
+                            <button onclick="checkGame(false)" class="py-4 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 shadow-lg shadow-red-500/20 transition">FALSO</button>
+                        </div>
+                        <div id="game-feedback" class="text-center font-bold h-8"></div>
+                    </div>
+                    <p class="text-xs text-center mt-4 opacity-50 italic">Dica: Avalie a expressão como se você fosse o processador!</p>
+                `
+            },
+            {
+                title: "Combinando Operadores",
+                icon: "fa-layer-group",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Expressões Complexas</h2>
+                    <p>Na vida real, combinamos tudo. Veja um sistema de acesso complexo:</p>
+                    <div class="code-block mt-6">
+                        <span class="code-highlight">let</span> acesso = (temCartao <span class="code-operator">&&</span> biometriaOk) <span class="code-operator">||</span> senhaMestra;
+                    </div>
+                    <p class="mt-4">Aqui, você entra se tiver cartão e biometria, OU se souber a senha mestra.</p>
+                `
+            },
+            {
+                title: "Lógica no Campo de Batalha",
+                icon: "fa-vial",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">No Campo de Batalha</h2>
+                    <p>Bugs de lógica são os que causam prejuízos milionários. Um sinal de <b>>=</b> trocado por <b>></b> pode dar frete grátis para quem não deveria ter.</p>
+                    <div class="pulo-gato mt-6">
+                        <strong>Dica do Mentor:</strong> Sempre teste os "limites". Se a regra é "idade >= 18", teste o código com exatamente 18 anos. É ali que a maioria dos erros acontece.
+                    </div>
+                `
+            },
+            {
+                title: "De Morgan (Leis da Lógica)",
+                icon: "fa-university",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Leis de De Morgan</h2>
+                    <p>Uma curiosidade matemática: Negar um <b>&&</b> é o mesmo que transformar em um <b>||</b> com as partes negadas.</p>
+                    <div class="code-block mt-4 text-xs">
+                        !(A && B)  ==  (!A || !B)
+                    </div>
+                    <p class="mt-4">Isso é usado para simplificar códigos difíceis de ler.</p>
+                `
+            },
+            {
+                title: "Comparação de Booleano",
+                icon: "fa-toggle-off",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Comparando Booleano</h2>
+                    <p>Podemos comparar os próprios booleanos. Parece redundante, mas acontece muito em códigos legados.</p>
+                    <div class="code-block mt-4">
+                        <span class="code-highlight">if</span> (estaAtivo <span class="code-operator">==</span> <span class="code-val">true</span>) { ... }
+                    </div>
+                    <p class="mt-2 text-sm italic">Dica: No dia a dia, use apenas <code class="font-bold">if (estaAtivo)</code>. É mais limpo!</p>
+                `
+            },
+            {
+                title: "Operador Ternário",
+                icon: "fa-question",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">O Operador Ternário</h2>
+                    <p>É uma forma curta de fazer uma comparação e já decidir um valor.</p>
+                    <div class="code-block mt-6 text-sm">
+                        <span class="code-highlight">let</span> status = idade <span class="code-operator">>=</span> <span class="code-val">18</span> <span class="code-operator">?</span> <span class="code-val">"Adulto"</span> <span class="code-operator">:</span> <span class="code-val">"Menor"</span>;
+                    </div>
+                    <p class="mt-4">Lemos assim: "Idade é maior ou igual a 18? Se sim, 'Adulto'. Senão, 'Menor'."</p>
+                `
+            },
+            {
+                title: "Lógica em Jogos",
+                icon: "fa-gamepad",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Exemplo: Sistema de Vidas</h2>
+                    <p>Como saber se o jogador morreu?</p>
+                    <div class="code-block mt-6">
+                        <span class="code-highlight">let</span> gameOver = (vidas <span class="code-operator"><=</span> <span class="code-val">0</span>) <span class="code-operator">||</span> (tempo <span class="code-operator"><=</span> <span class="code-val">0</span>);
+                    </div>
+                    <p class="mt-4">Viu como a lógica de comparação está em todo lugar?</p>
+                `
+            },
+            {
+                title: "FAQ - Dúvidas Comuns",
+                icon: "fa-question-circle",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">FAQ</h2>
+                    <div class="space-y-4">
+                        <p><b>P: Posso usar && e || na mesma frase?</b><br>R: Sim, mas use parênteses para não confundir o computador.</p>
+                        <p><b>P: Por que usar === em vez de ==?</b><br>R: Para evitar bugs onde o computador acha que o texto "1" é igual ao número 1.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Dicas de Estudo",
+                icon: "fa-graduation-cap",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Como treinar?</h2>
+                    <p>Lógica é como um músculo. Pratique desenhando tabelas verdade no papel para expressões que você encontra no dia a dia.</p>
+                    <div class="pulo-gato mt-4 text-sm">
+                        <b>Ex:</b> "Se eu tiver dinheiro E o shopping estiver aberto, eu compro um jogo."
+                    </div>
+                `
+            },
+            {
+                title: "Revisão dos Operadores",
+                icon: "fa-list-check",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">Resumo Geral</h2>
+                    <ul class="grid grid-cols-2 gap-4 text-xs font-mono">
+                        <li class="p-2 border rounded bg-slate-50 dark:bg-slate-800">== Igual</li>
+                        <li class="p-2 border rounded bg-slate-50 dark:bg-slate-800">!= Diferente</li>
+                        <li class="p-2 border rounded bg-slate-50 dark:bg-slate-800">&& E (Todos verdade)</li>
+                        <li class="p-2 border rounded bg-slate-50 dark:bg-slate-800">|| OU (Um verdade)</li>
+                        <li class="p-2 border rounded bg-slate-50 dark:bg-slate-800">! NÃO (Inverte)</li>
+                        <li class="p-2 border rounded bg-slate-50 dark:bg-slate-800">=== Estritamente igual</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Recapitulando",
+                icon: "fa-history",
+                content: `
+                    <h2 class="text-3xl font-bold mb-4">O que aprendemos hoje?</h2>
+                    <ul class="list-disc pl-6 space-y-2 mt-6">
+                        <li>Comparar valores com Operadores Relacionais;</li>
+                        <li>Combinar condições com Operadores Lógicos;</li>
+                        <li>Construir e entender Tabelas Verdade;</li>
+                        <li>Resolver enigmas proposicionais.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Conclusão e Próximo Passo",
+                icon: "fa-flag-checkered",
+                content: `
+                    <h2 class="text-4xl font-extrabold mb-4 text-purple-600 tracking-tighter text-center">Nível Concluído!</h2>
+                    <p class="text-center text-lg">Agora você entende como a lógica proposicional rege as decisões do software.</p>
+                    <div class="mt-8 flex justify-center">
+                        <div class="text-center">
+                            <i class="fas fa-key text-6xl text-yellow-500 mb-2 drop-shadow-lg"></i>
+                            <p class="font-bold">Mestre das Decisões</p>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        let currentIdx = parseInt(localStorage.getItem('savedSlide_d7')) || 0;
+        let userXP = parseInt(localStorage.getItem('savedXP_d7')) || 0;
+        let fontSize = 16;
+        let currentGameChallenge = null;
+
+        function render() {
+            const slide = material[currentIdx];
+            const container = document.getElementById('slide-container');
+            container.innerHTML = slide.content;
+            
+            document.getElementById('page-nav').innerText = `${String(currentIdx + 1).padStart(2, '0')} / ${material.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentIdx + 1) / material.length) * 100}%`;
+            
+            updateTOC();
+            updateXP();
+            localStorage.setItem('savedSlide_d7', currentIdx);
+            document.getElementById('content-viewport').scrollTop = 0;
+
+            if (slide.icon === "fa-key") initGame();
+        }
+
+        function next() { if (currentIdx < material.length - 1) { currentIdx++; addXP(15); render(); } }
+        function prev() { if (currentIdx > 0) { currentIdx--; render(); } }
+        function goTo(i) { currentIdx = i; render(); }
+
+        function updateTOC() {
+            const list = document.getElementById('toc-list');
+            list.innerHTML = material.map((s, i) => `
+                <button onclick="goTo(${i})" class="w-full flex items-center gap-3 p-2 rounded-lg text-left transition ${i === currentIdx ? 'bg-purple-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                    <i class="fas ${s.icon} w-5"></i>
+                    <span class="text-xs font-bold truncate">${s.title}</span>
+                </button>
+            `).join('');
+        }
+
+        function addXP(v) { userXP += v; localStorage.setItem('savedXP_d7', userXP); updateXP(); }
+
+        function updateXP() {
+            const perc = Math.min((userXP / 800) * 100, 100);
+            document.getElementById('xp-indicator').innerText = Math.floor(perc) + '%';
+            document.getElementById('xp-text').innerText = `${userXP} / 800 XP`;
+            const ranks = ["Iniciante", "Explorador", "Logístico", "Arquiteto", "Mestre"];
+            document.getElementById('user-rank').innerText = ranks[Math.min(Math.floor(userXP/150), 4)];
+        }
+
+        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+        function adjustFont(d) { fontSize += d; document.getElementById('content-viewport').style.fontSize = fontSize + 'px'; }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
+
+        // Game Logic
+        const challenges = [
+            { exp: "(10 > 5) && (2 < 4)", ans: true },
+            { exp: "(10 == 10) || (5 < 2)", ans: true },
+            { exp: "!(5 > 2)", ans: false },
+            { exp: "(3 != 3) && (true)", ans: false },
+            { exp: "(10 >= 10) && (5 != 5)", ans: false },
+            { exp: "!(false) || (2 > 10)", ans: true }
+        ];
+
+        function initGame() {
+            currentGameChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+            document.getElementById('logic-expression').innerText = currentGameChallenge.exp;
+            document.getElementById('game-container').classList.remove('solved');
+            document.getElementById('game-feedback').innerText = "";
+        }
+
+        function checkGame(val) {
+            const feedback = document.getElementById('game-feedback');
+            if (val === currentGameChallenge.ans) {
+                feedback.innerHTML = "<span class='text-green-500'>CORRETO! Você abriu a porta.</span>";
+                document.getElementById('game-container').classList.add('solved');
+                addXP(50);
+                setTimeout(initGame, 2000);
+            } else {
+                feedback.innerHTML = "<span class='text-red-500'>Ops! A lógica falhou. Tente novamente.</span>";
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if(e.key === "ArrowRight") next();
+            if(e.key === "ArrowLeft") prev();
+        });
+
+        render();
+    </script>
+</body>
+</html>
