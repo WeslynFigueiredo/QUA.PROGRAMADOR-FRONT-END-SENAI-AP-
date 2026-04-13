@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Quiz: Lógica de Programação</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        .option-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        .option-btn.correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #166534 !important;
+        }
+
+        .option-btn.wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+
+        .progress-bar {
+            transition: width 0.4s ease-out;
+        }
+
+        .code-snippet {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        #feedback-box {
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-2xl w-full">
+        <!-- Header & Progress -->
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-extrabold text-slate-900 mb-2">
+                <i class="fas fa-terminal text-blue-600 mr-2"></i>Master Quiz de Lógica
+            </h1>
+            <p class="text-slate-500 font-medium">Desafio de 15 Questões para Futuros Devs</p>
+            
+            <div class="mt-6">
+                <div class="flex justify-between text-xs font-bold text-slate-400 mb-2 uppercase tracking-tighter">
+                    <span id="progress-text">Questão 1 de 15</span>
+                    <span id="score-text">Pontos: 0</span>
+                </div>
+                <div class="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
+                    <div id="progress-fill" class="h-full bg-blue-600 progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quiz-card" class="glass-card rounded-3xl p-6 md:p-10 min-h-[450px] flex flex-col justify-center transition-all duration-300">
+            <!-- Question Area -->
+            <div id="question-area">
+                <div id="category-tag" class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold uppercase mb-4 tracking-widest">
+                    Fundamentos
+                </div>
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 mb-6">
+                    Carregando desafio...
+                </h2>
+                
+                <div id="code-container" class="hidden">
+                    <div class="code-snippet code-font" id="code-content"></div>
+                </div>
+
+                <!-- Options -->
+                <div id="options-grid" class="grid grid-cols-1 gap-3 mb-6">
+                    <!-- Buttons injected by JS -->
+                </div>
+
+                <!-- Feedback Area -->
+                <div id="feedback-box" class="hidden p-4 rounded-2xl mb-6 border-l-4">
+                    <p id="feedback-text" class="text-sm font-medium leading-relaxed"></p>
+                    <button id="btn-next" onclick="nextQuestion()" class="mt-4 px-6 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition flex items-center gap-2 mx-auto">
+                        Próxima Questão <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Area (Hidden by default) -->
+            <div id="result-area" class="hidden text-center py-10">
+                <div id="result-icon" class="text-7xl mb-6"></div>
+                <h2 id="result-title" class="text-3xl font-black text-slate-900 mb-2"></h2>
+                <p id="result-desc" class="text-slate-500 mb-8"></p>
+                <button onclick="restartQuiz()" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition">
+                    Tentar Novamente
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <p class="mt-6 text-center text-slate-400 text-xs font-medium">
+            Desenvolvido para Turmas de Lógica de Programação • SENAI 2024
+        </p>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                category: "Nomenclatura",
+                q: "Qual destes nomes de variável segue as regras do JavaScript e é considerado VÁLIDO?",
+                options: ["let 10vagas;", "let meu-nome;", "let $preco;", "let let;"],
+                rationales: [
+                    "Incorreto. Variáveis não podem começar com números.",
+                    "Incorreto. O hífen (-) é um operador de subtração. Use camelCase ou underscore.",
+                    "Correto! O caractere cifrão ($) é um dos poucos símbolos permitidos no início.",
+                    "Incorreto. 'let' é uma palavra reservada do sistema e não pode ser usada como nome."
+                ],
+                correct: 2
+            },
+            {
+                category: "Declaração",
+                q: "Qual palavra-chave usamos para criar uma variável que NÃO pode ter seu valor alterado depois?",
+                options: ["let", "var", "set", "const"],
+                rationales: [
+                    "Incorreto. 'let' permite que o valor seja alterado durante o programa.",
+                    "Incorreto. 'var' é uma forma antiga e também permite alteração de valores.",
+                    "Incorreto. 'set' não é uma palavra-chave para declaração de variáveis.",
+                    "Correto! 'const' cria uma constante, cujo valor é imutável após a definição."
+                ],
+                correct: 3
+            },
+            {
+                category: "Tipos de Dados",
+                q: "Se definirmos let valor = '25'; qual o tipo de dado dessa variável?",
+                options: ["Number", "String", "Boolean", "Null"],
+                rationales: [
+                    "Incorreto. Embora 25 seja um número, as aspas o transformam em texto.",
+                    "Correto! Tudo que está entre aspas simples ou duplas é tratado como String (texto).",
+                    "Incorreto. Booleanos são apenas true ou false, sem aspas.",
+                    "Incorreto. Null representa ausência de valor, o que não é o caso aqui."
+                ],
+                correct: 1
+            },
+            {
+                category: "Operadores Aritméticos",
+                q: "Qual o resultado de document.write(17 % 5); ?",
+                options: ["3", "3.4", "2", "0"],
+                rationales: [
+                    "Incorreto. 3 é o resultado da divisão inteira, não o resto.",
+                    "Incorreto. O operador % não retorna casas decimais.",
+                    "Correto! 17 dividido por 5 é igual a 3, sobrando 2. O resto da divisão é 2.",
+                    "Incorreto. A divisão de 17 por 5 não é exata."
+                ],
+                correct: 2
+            },
+            {
+                category: "Potência",
+                q: "Como calculamos 2 elevado ao cubo (2³) usando operadores aritméticos?",
+                options: ["2 ^ 3", "2 * 3", "2 ** 3", "2 # 3"],
+                rationales: [
+                    "Incorreto. Em JS, o símbolo ^ realiza uma operação lógica binária (XOR).",
+                    "Incorreto. Isso seria 2 vezes 3, resultando em 6.",
+                    "Correto! No JavaScript moderno, o operador de exponenciação é **.",
+                    "Incorreto. O caractere # não é um operador aritmético em JS."
+                ],
+                correct: 2
+            },
+            {
+                category: "Concatenação",
+                q: "Qual será a saída do comando: document.write('10' + 10); ?",
+                options: ["20", "1010", "Erro", "Undefined"],
+                rationales: [
+                    "Incorreto. Isso ocorreria se ambos fossem números.",
+                    "Correto! O JS converte o número para texto e os 'gruda' (concatena).",
+                    "Incorreto. O JS é flexível e permite essa operação sem erros fatais.",
+                    "Incorreto. O resultado é um valor definido por concatenação."
+                ],
+                correct: 1
+            },
+            {
+                category: "Comparação",
+                q: "O operador === (três iguais) serve para verificar:",
+                options: ["Apenas o valor", "Apenas o tipo", "Valor e Tipo simultaneamente", "Se a variável é constante"],
+                rationales: [
+                    "Incorreto. Apenas o valor é verificado pelo operador de dois iguais (==).",
+                    "Incorreto. Ele verifica os dois critérios ao mesmo tempo.",
+                    "Correto! É o operador de igualdade estrita: 5 === '5' daria falso porque os tipos são diferentes.",
+                    "Incorreto. Não há relação com a mutabilidade da variável."
+                ],
+                correct: 2
+            },
+            {
+                category: "Lógica AND",
+                q: "Qual o resultado da expressão: (10 > 5) && (3 < 1) ?",
+                options: ["true", "false", "1", "null"],
+                rationales: [
+                    "Incorreto. Para ser verdade no AND (&&), ambos os lados devem ser verdadeiros.",
+                    "Correto! Como (3 < 1) é falso, a expressão inteira se torna falsa.",
+                    "Incorreto. O resultado de uma comparação lógica é um booleano.",
+                    "Incorreto. Não há erro ou ausência de valor na expressão."
+                ],
+                correct: 1
+            },
+            {
+                category: "Lógica OR",
+                q: "Qual o resultado da expressão: (2 === 2) || (10 < 2) ?",
+                options: ["true", "false", "undefined", "NaN"],
+                rationales: [
+                    "Correto! No operador OU (||), se apenas uma das partes for verdadeira, o resultado é true.",
+                    "Incorreto. Como o primeiro lado é verdadeiro, o resultado não pode ser falso.",
+                    "Incorreto. O resultado é um valor booleano definido.",
+                    "Incorreto. Não há erros matemáticos nesta lógica."
+                ],
+                correct: 0
+            },
+            {
+                category: "Negação",
+                q: "O que document.write(!true); exibe na tela?",
+                options: ["true", "false", "0", "!"],
+                rationales: [
+                    "Incorreto. O operador de exclamação inverte o valor.",
+                    "Correto! A negação de verdadeiro é falso.",
+                    "Incorreto. O valor booleano não é convertido para número aqui.",
+                    "Incorreto. O símbolo não é impresso, ele é um operador lógico."
+                ],
+                correct: 1
+            },
+            {
+                category: "Precedência",
+                code: "let conta = 5 + 5 * 2;\ndocument.write(conta);",
+                q: "Analisando o código ao lado, qual valor será exibido?",
+                options: ["20", "15", "50", "10"],
+                rationales: [
+                    "Incorreto. Você somou antes de multiplicar.",
+                    "Correto! A multiplicação (*) tem precedência sobre a soma (+). Primeiro fazemos 5*2=10, depois 5+10=15.",
+                    "Incorreto. O cálculo matemático não resulta neste valor.",
+                    "Incorreto. Este seria o resultado se ignorássemos os outros termos."
+                ],
+                correct: 1
+            },
+            {
+                category: "Atribuição",
+                code: "let pontos = 10;\npontos += 5;\ndocument.write(pontos);",
+                q: "Qual o valor final da variável 'pontos'?",
+                options: ["10", "5", "15", "105"],
+                rationales: [
+                    "Incorreto. O valor original foi alterado pela soma acumulada.",
+                    "Incorreto. O valor foi somado, não substituído por 5.",
+                    "Correto! O operador += adiciona o valor à variável existente. É o mesmo que pontos = 10 + 5.",
+                    "Incorreto. Não houve concatenação de texto aqui, apenas soma numérica."
+                ],
+                correct: 2
+            },
+            {
+                category: "Tipagem",
+                q: "Qual o tipo de dado resultante de document.write(typeof true); ?",
+                options: ["string", "boolean", "number", "object"],
+                rationales: [
+                    "Incorreto. O typeof retornará o nome do tipo, mas o valor 'true' não é string.",
+                    "Correto! O JavaScript identifica true/false como o tipo lógico Boolean.",
+                    "Incorreto. Números são valores matemáticos.",
+                    "Incorreto. Objetos são coleções complexas de dados."
+                ],
+                correct: 1
+            },
+            {
+                category: "Análise de Código",
+                code: "let a = 10;\nlet b = 20;\ndocument.write(a > b || b > a);",
+                q: "O que será exibido no navegador?",
+                options: ["true", "false", "10", "20"],
+                rationales: [
+                    "Correto! Como b > a é verdadeiro, o operador OU garante que o resultado final seja true.",
+                    "Incorreto. Pelo menos um dos lados da comparação é verdadeiro.",
+                    "Incorreto. A saída de uma comparação é um booleano, não o valor da variável.",
+                    "Incorreto. O resultado lógico não é um dos números comparados."
+                ],
+                correct: 0
+            },
+            {
+                category: "Desafio Final",
+                code: "let x = 2;\nlet y = '2';\ndocument.write(x == y && x === y);",
+                q: "Qual o resultado final desta expressão complexa?",
+                options: ["true", "false", "22", "undefined"],
+                rationales: [
+                    "Incorreto. Embora a primeira parte seja true, a segunda é false (tipos diferentes).",
+                    "Correto! O operador && exige que ambos sejam true. Como x === y é false, a expressão morre ali.",
+                    "Incorreto. Não há soma ou concatenação sendo exibida.",
+                    "Incorreto. O resultado da operação lógica é um booleano definido."
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let canAnswer = true;
+
+        const questionText = document.getElementById('question-text');
+        const categoryTag = document.getElementById('category-tag');
+        const optionsGrid = document.getElementById('options-grid');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const scoreText = document.getElementById('score-text');
+        const codeContainer = document.getElementById('code-container');
+        const codeContent = document.getElementById('code-content');
+        const quizArea = document.getElementById('question-area');
+        const resultArea = document.getElementById('result-area');
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackText = document.getElementById('feedback-text');
+
+        function loadQuestion() {
+            canAnswer = true;
+            feedbackBox.classList.add('hidden');
+            const q = questions[currentQuestion];
+            
+            categoryTag.innerText = q.category;
+            questionText.innerText = q.q;
+            progressText.innerText = `Questão ${currentQuestion + 1} de ${questions.length}`;
+            progressFill.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            scoreText.innerText = `Pontos: ${score}`;
+
+            if (q.code) {
+                codeContainer.classList.remove('hidden');
+                codeContent.innerText = q.code;
+            } else {
+                codeContainer.classList.add('hidden');
+            }
+
+            optionsGrid.innerHTML = '';
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn p-4 bg-white border border-slate-200 rounded-2xl text-left text-sm font-semibold text-slate-700 shadow-sm';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(index, btn);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(index, btn) {
+            if (!canAnswer) return;
+            canAnswer = false;
+
+            const q = questions[currentQuestion];
+            const correctIndex = q.correct;
+            const allButtons = optionsGrid.querySelectorAll('button');
+
+            // Visual feedback on buttons
+            if (index === correctIndex) {
+                btn.classList.add('correct');
+                score += 10;
+                feedbackBox.className = 'p-4 rounded-2xl mb-6 border-l-4 bg-green-50 border-green-500 text-green-800';
+            } else {
+                btn.classList.add('wrong');
+                allButtons[correctIndex].classList.add('correct');
+                feedbackBox.className = 'p-4 rounded-2xl mb-6 border-l-4 bg-red-50 border-red-500 text-red-800';
+            }
+
+            // Show rationale for chosen option
+            feedbackText.innerHTML = `<strong>Feedback:</strong> ${q.rationales[index]}`;
+            feedbackBox.classList.remove('hidden');
+            scoreText.innerText = `Pontos: ${score}`;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizArea.classList.add('hidden');
+            resultArea.classList.remove('hidden');
+            
+            const perc = (score / (questions.length * 10)) * 100;
+            const title = document.getElementById('result-title');
+            const desc = document.getElementById('result-desc');
+            const icon = document.getElementById('result-icon');
+
+            if (perc >= 80) {
+                icon.innerText = "🏆";
+                title.innerText = "Mestre da Lógica!";
+                desc.innerText = `Incrível! Você acertou ${score / 10} de ${questions.length}. Você está pronto para o Front-End!`;
+            } else if (perc >= 50) {
+                icon.innerText = "🚀";
+                title.innerText = "Bom Trabalho!";
+                desc.innerText = `Você acertou ${score / 10} questões. Com um pouco mais de treino, você será um expert.`;
+            } else {
+                icon.innerText = "📚";
+                title.innerText = "Continue Praticando";
+                desc.innerText = `Você acertou ${score / 10}. A lógica de programação exige prática diária. Vamos tentar de novo?`;
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            quizArea.classList.remove('hidden');
+            resultArea.classList.add('hidden');
+            loadQuestion();
+        }
+
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
